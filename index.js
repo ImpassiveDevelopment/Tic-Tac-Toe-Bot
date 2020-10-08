@@ -147,5 +147,6 @@ bot.on('message', async message => {
       `)
     )
   }
+})
 
 bot.login('TOKEN')
