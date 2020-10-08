@@ -148,4 +148,4 @@ bot.on('message', async message => {
     )
   }
 
-bot.login('NzYyODMzOTY5MTgzMzI2MjI4.X3u6fw.xD4AElCTV-8fAax5V2H8aIF7vFk')
+bot.login('TOKEN')
