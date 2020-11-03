@@ -17,14 +17,14 @@ validMoves.add('A3')
 validMoves.add('B3')
 validMoves.add('C3')
 
-const bot = new Discord.Client()
+const bot = new Discord.Client({fetchAllMembers: true})
 
 bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user.tag} in ${bot.guilds.cache.size} servers`)
 })
 
 bot.on('message', async message => {
-  let prefix = '.';
+  let prefix = '/';
   let arr = message.content.split(' ')
   let cmd = arr[0];
   let args = arr.slice(1)
@@ -48,7 +48,7 @@ bot.on('message', async message => {
   }
 
   if(cmd === 'game'){
-    let member = message.mentions.members.first() || message.guild.membes.cache.get(args[0])
+    let member = message.mentions.members.first() || message.guild.members.cache.get(args[0])
     if(!member) return;
     if(games.has(`${message.author.id}`)){
       return message.channel.send('You are already in a game')
@@ -198,4 +198,4 @@ bot.on('message', async message => {
   }
 })
 
-bot.login('NzU5Mjg4NTQ1MjA5NzQ1NDI4.X27UkA._9mmhSmiAR19RYZxfZHBv_TP4L8')
+bot.login(TOKEN)
