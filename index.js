@@ -2,10 +2,9 @@ const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
 
 
-var game = false;
-var tic;
-var xPlayer,oPlayer;
-var turnPlayer;
+var games = new Map()
+var gameStates = new Map()
+var no = 0;
 
 let validMoves = new Set();
 validMoves.add('A1')
@@ -25,7 +24,7 @@ bot.on('ready', async () => {
 })
 
 bot.on('message', async message => {
-  let prefix = '/';
+  let prefix = '.';
   let arr = message.content.split(' ')
   let cmd = arr[0];
   let args = arr.slice(1)
@@ -40,6 +39,8 @@ bot.on('message', async message => {
       **${prefix}help** - Show this embed
       **${prefix}game <member>** - Start a game with another member
       **${prefix}move <square>** - Take your turn in the game
+      **${prefix}end** - End your current game
+      **${prefix}board** - Show your current game state
       **${prefix}say <something>** - Make the bot say something
       **${prefix}how** - Show a basic how to play
       `)
@@ -49,77 +50,125 @@ bot.on('message', async message => {
   if(cmd === 'game'){
     let member = message.mentions.members.first() || message.guild.membes.cache.get(args[0])
     if(!member) return;
-    if(game === true){
-      return message.channel.send('There is already a game going on')
-    }else{
-      game = true;
-      let x = args[1] || '❌';
-      let o = args[2] || '⭕';
-      tic = new nano(message.member.user.username, member.user.username, x, o, '⬛')
-      xPlayer = [message.author.id, 'x'];
-      oPlayer = [member.id, 'o']
-      turnPlayer = xPlayer;
-      message.channel.send(new Discord.MessageEmbed()
+    if(games.has(`${message.author.id}`)){
+      return message.channel.send('You are already in a game')
+    }
+    if(games.has(`${member.id}`)){
+      return message.channel.send('The tagged person is in a game')
+    }
+    games.set(`${message.author.id}`, {
+      game: true,
+      gameId: no,
+    })
+    games.set(`${member.id}`, {
+      game: true,
+      gameId: no,
+    })
+    let x = args[1] || '❌';
+    let o = args[2] || '⭕';
+    gameStates.set(no, {
+      game: new nano(message.member.user.username, member.user.username, x, o, '⬛'),
+      xPlayer: [message.author.id, 'x'],
+      oPlayer: [member.id, 'o'],
+    })
+    gameStates.get(no).turnPlayer = gameStates.get(no).xPlayer;
+    let tic = gameStates.get(no);
+    no++;
+    message.channel.send(
+      new Discord.MessageEmbed()
       .setTitle(`Tic Tac Toe`)
       .setDescription(`
       ${message.member.user.username} vs. ${member.user.username}
-      ${tic.visualize()}
+      ${tic.game.visualize()}
       `)
-      )
-    }
+    )
   }
 
   if(cmd === 'move'){
     let move = args[0];
-    if(game === false){
-      return message.channel.send('There is no game going on')
+    if(!games.has(`${message.author.id}`)){
+      return message.channel.send('You are not in a game!')
     }
     if(!args[0]){
       return message.channel.send('You must specify a move')
     }
     let mo = move.toUpperCase();
-    console.log(mo);
+
     if(!validMoves.has(mo)){
       return message.channel.send('That is not a valid tic tac toe board square')
     }
-    if(message.author.id != turnPlayer[0]){
+    let player = games.get(`${message.author.id}`);
+    let tic = gameStates.get(player.gameId)
+    if(message.author.id != tic.turnPlayer[0]){
       return message.channel.send('It is not your turn')
     }else{
-      let a = tic.turn(move, turnPlayer[1])
+      let a = tic.game.turn(move, tic.turnPlayer[1])
       if(a === false){
         return message.channel.send('Invalid Move')
       }else{
         message.channel.send(new Discord.MessageEmbed()
           .setTitle(`Tic Tac Toe`)
           .setDescription(`
-          ${message.guild.members.cache.get(xPlayer[0])} vs. ${message.guild.members.cache.get(oPlayer[0])}
-          ${tic.visualize()}
+          ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
+          ${tic.game.visualize()}
           `)
         )
-        if(tic.didWin() != false){
-          message.channel.send(tic.didWin()+'\n***Game Movelog***\n'+tic.moveLog.join('\n'))
-          game = false;
-          xPlayer = null;
-          oPlayer = null;
-          turnPlayer = null;
-          tic = null;
+        if(tic.game.didWin() != false && tic.game.didWin() != 'No one Wins'){
+          message.channel.send(tic.game.didWin()+'\n***Game Movelog***\n'+tic.game.moveLog.join('\n'))
+          games.delete(tic.xPlayer[0])
+          games.delete(tic.oPlayer[0])
         //Turns out, I forgot to put the draw condition smh
-        }else if(tic.board.A1!='' && tic.board.A2!='' && tic.board.A3!='' && tic.board.B1!='' && tic.board.B2!='' && tic.board.B3!='' && tic.board.C1!='' && tic.board.C2!='' && tic.board.C3!=''){
-          message.channel.send('No Winner'+'\n***Game Movelog***\n'+tic.moveLog.join('\n'))
-          game = false;
-          xPlayer = null;
-          oPlayer = null;
-          turnPlayer = null;
-          tic = null;
+        }else if(tic.game.board.A1!='' && tic.game.board.A2!='' && tic.game.board.A3!='' && tic.game.board.B1!='' && tic.game.board.B2!='' && tic.game.board.B3!='' && tic.game.board.C1!='' && tic.game.board.C2!='' && tic.game.board.C3!=''){
+          message.channel.send('No Winner'+'\n***Game Movelog***\n'+tic.game.moveLog.join('\n'))
+          games.delete(tic.xPlayer[0])
+          games.delete(tic.oPlayer[0])
         }else{
-          if(turnPlayer === xPlayer){
-            turnPlayer = oPlayer
+          if(tic.turnPlayer === tic.xPlayer){
+            tic.turnPlayer = tic.oPlayer
           }else{
-            turnPlayer = xPlayer
+            tic.turnPlayer = tic.xPlayer
           }
         }
       }
     }
+  }
+
+  if(cmd === 'end'){
+    if(!games.has(`${message.author.id}`)){
+      return message.channel.send('You are not in a game')
+    }
+    let p = games.get(`${message.author.id}`)
+    let tic = gameStates.get(p.gameId)
+    games.delete(`${tic.xPlayer[0]}`)
+    games.delete(`${tic.oPlayer[0]}`)
+    message.channel.send(
+      new Discord.MessageEmbed()
+      .setTitle(`Game Ended by ${message.author.username}`)
+      .setDescription(`
+        ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
+        ${tic.game.visualize()}
+
+        **Movelog**
+        ${tic.game.moveLog.join('\n')}
+      `)
+    )
+  }
+
+  if(cmd === 'board'){
+    if(!games.has(`${message.author.id}`)){
+      return message.channel.send('You are not in a game')
+    }
+    let p = games.get(`${message.author.id}`)
+    let tic = gameStates.get(p.gameId)
+
+    message.channel.send(
+      new Discord.MessageEmbed()
+      .setTitle(`Tic Tac Toe`)
+      .setDescription(`
+        ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
+        ${tic.game.visualize()}
+      `)
+    )
   }
 
   if(cmd === 'say'){
@@ -149,4 +198,4 @@ bot.on('message', async message => {
   }
 })
 
-bot.login('TOKEN')
+bot.login('NzU5Mjg4NTQ1MjA5NzQ1NDI4.X27UkA._9mmhSmiAR19RYZxfZHBv_TP4L8')
