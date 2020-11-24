@@ -1,5 +1,7 @@
 const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
+const fs = require('fs');
+const DBL = require("dblapi.js");
 
 
 var games = new Map()
@@ -18,13 +20,26 @@ validMoves.add('B3')
 validMoves.add('C3')
 
 const bot = new Discord.Client({fetchAllMembers: true})
+const dbl = new DBL('', { webhookPort: 5000, webhookAuth: '' }, bot);
+
+dbl.webhook.on('ready', hook => {
+  console.log(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
+});
+dbl.webhook.on('vote', vote => {
+  bot.channels.cache.get('778460112313647175').send(`User ${bot.users.cache.get(vote.user).tag} just voted for Tic-Tac-Toe!`);
+	
+	console.log({channel: bot.channels.cache.get('778460112313647175'), user: user, _user: bot.users.cache.get(vote.user)});
+});
 
 bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user.tag} in ${bot.guilds.cache.size} servers`)
+  bot.guilds.cache.forEach(g => {
+    console.log(g.name);
+  })
 })
 
 bot.on('message', async message => {
-  let prefix = '/';
+  let prefix = 't!';
   let arr = message.content.split(' ')
   let cmd = arr[0];
   let args = arr.slice(1)
@@ -44,6 +59,8 @@ bot.on('message', async message => {
       **${prefix}say <something>** - Make the bot say something
       **${prefix}how** - Show a basic how to play
       `)
+      .setFooter('Want to support the bot? Vote for it on top.gg')
+      .setURL('https://top.gg/bot/762833969183326228/')
     )
   }
 
@@ -56,6 +73,8 @@ bot.on('message', async message => {
     if(games.has(`${member.id}`)){
       return message.channel.send('The tagged person is in a game')
     }
+    let g = fs.readFileSync('./games.txt').toString();
+    fs.writeFile('./games.txt', `${g}\n\nNew Game in server ${message.guild.name} - ${message.guild.id}`, function(){})
     games.set(`${message.author.id}`, {
       game: true,
       gameId: no,
@@ -198,4 +217,4 @@ bot.on('message', async message => {
   }
 })
 
-bot.login(TOKEN)
+bot.login('')
