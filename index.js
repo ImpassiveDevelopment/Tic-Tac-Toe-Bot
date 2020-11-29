@@ -20,16 +20,6 @@ validMoves.add('B3')
 validMoves.add('C3')
 
 const bot = new Discord.Client({fetchAllMembers: true})
-const dbl = new DBL('', { webhookPort: 5000, webhookAuth: '' }, bot);
-
-dbl.webhook.on('ready', hook => {
-  console.log(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
-});
-dbl.webhook.on('vote', vote => {
-  bot.channels.cache.get('778460112313647175').send(`User ${bot.users.cache.get(vote.user).tag} just voted for Tic-Tac-Toe!`);
-	
-	console.log({channel: bot.channels.cache.get('778460112313647175'), user: user, _user: bot.users.cache.get(vote.user)});
-});
 
 bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user.tag} in ${bot.guilds.cache.size} servers`)
@@ -111,7 +101,9 @@ bot.on('message', async message => {
     if(!args[0]){
       return message.channel.send('You must specify a move')
     }
-    let mo = move.toUpperCase();
+    move = move.split('')
+    move[0] = move[0].toUpperCase()
+    let mo = move.join('')
 
     if(!validMoves.has(mo)){
       return message.channel.send('That is not a valid tic tac toe board square')
@@ -121,7 +113,7 @@ bot.on('message', async message => {
     if(message.author.id != tic.turnPlayer[0]){
       return message.channel.send('It is not your turn')
     }else{
-      let a = tic.game.turn(move, tic.turnPlayer[1])
+      let a = tic.game.turn(mo, tic.turnPlayer[1])
       if(a === false){
         return message.channel.send('Invalid Move')
       }else{
@@ -217,4 +209,4 @@ bot.on('message', async message => {
   }
 })
 
-bot.login('')
+bot.login('TOKEN')
