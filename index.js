@@ -21,11 +21,34 @@ validMoves.add('C3')
 
 const bot = new Discord.Client({fetchAllMembers: true})
 
+function checkTime(i) {
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
+
+function toHMS(ms){
+  var seconds = ms / 1000;
+  var hours = parseInt( seconds / 3600 );
+  seconds = seconds % 3600;
+  var minutes = parseInt( seconds / 60 );
+  seconds = seconds % 60;
+  return hours+":"+checkTime(minutes)+":"+checkTime(seconds);
+}
+
 bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user.tag} in ${bot.guilds.cache.size} servers`)
-  bot.guilds.cache.forEach(g => {
-    console.log(g.name);
-  })
+	bot.user.setActivity({
+		type: "WATCHING",
+		name: `For t!help in ${bot.guilds.cache.size} servers`
+	})
+  setInterval(() => {
+    bot.user.setActivity({
+      type: 'WATCHING',
+      name: `For t!help in ${bot.guilds.cache.size} servers`
+    })
+  }, 60000)
 })
 
 bot.on('message', async message => {
@@ -40,17 +63,10 @@ bot.on('message', async message => {
     message.channel.send(
       new Discord.MessageEmbed()
       .setTitle('Tic Tac Toe')
-      .setDescription(`
-      **${prefix}help** - Show this embed
-      **${prefix}game <member>** - Start a game with another member
-      **${prefix}move <square>** - Take your turn in the game
-      **${prefix}end** - End your current game
-      **${prefix}board** - Show your current game state
-      **${prefix}say <something>** - Make the bot say something
-      **${prefix}how** - Show a basic how to play
-      `)
+      .setColor('#b00b1e')
+      .setDescription(`**${prefix}help** - Show this embed\n**${prefix}game <member>** - Start a game with another member\n**${prefix}move <square>** - Take your turn in the game\n**${prefix}end** - End your current game\n**${prefix}board** - Show your current game state\n**${prefix}say <something>** - Make the bot say something\n**${prefix}how** - Show a basic how to play\n**${prefix}invite** - Get the bot invite link\n**${prefix}uptime** - Get the bot's current runtime`)
       .setFooter('Want to support the bot? Vote for it on top.gg')
-      .setURL('https://top.gg/bot/762833969183326228/')
+      .setURL('https://top.gg/bot/762833969183326228/vote')
     )
   }
 
@@ -63,8 +79,6 @@ bot.on('message', async message => {
     if(games.has(`${member.id}`)){
       return message.channel.send('The tagged person is in a game')
     }
-    let g = fs.readFileSync('./games.txt').toString();
-    fs.writeFile('./games.txt', `${g}\n\nNew Game in server ${message.guild.name} - ${message.guild.id}`, function(){})
     games.set(`${message.author.id}`, {
       game: true,
       gameId: no,
@@ -86,6 +100,7 @@ bot.on('message', async message => {
     message.channel.send(
       new Discord.MessageEmbed()
       .setTitle(`Tic Tac Toe`)
+      .setColor('#b00b1e')
       .setDescription(`
       ${message.member.user.username} vs. ${member.user.username}
       ${tic.game.visualize()}
@@ -119,6 +134,7 @@ bot.on('message', async message => {
       }else{
         message.channel.send(new Discord.MessageEmbed()
           .setTitle(`Tic Tac Toe`)
+          .setColor('#b00b1e')
           .setDescription(`
           ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
           ${tic.game.visualize()}
@@ -155,6 +171,7 @@ bot.on('message', async message => {
     message.channel.send(
       new Discord.MessageEmbed()
       .setTitle(`Game Ended by ${message.author.username}`)
+      .setColor('#b00b1e')
       .setDescription(`
         ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
         ${tic.game.visualize()}
@@ -175,6 +192,7 @@ bot.on('message', async message => {
     message.channel.send(
       new Discord.MessageEmbed()
       .setTitle(`Tic Tac Toe`)
+      .setColor('#b00b1e')
       .setDescription(`
         ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
         ${tic.game.visualize()}
@@ -194,6 +212,7 @@ bot.on('message', async message => {
     message.channel.send(
       new Discord.MessageEmbed()
       .setTitle('How to play Tic Tac Toe')
+      .setColor('#b00b1e')
       .setDescription(`
       Tic Tac Toe is played on a 3x3 grid of squares:
       \` \` 1️⃣ 2️⃣ 3️⃣
@@ -205,6 +224,24 @@ bot.on('message', async message => {
 
       When all 9 squares are occupied, the game is over. If neither player has three of their letters in a row, the game is a draw.
       `)
+    )
+  }
+
+  if(cmd == 'invite'){
+    message.channel.send(
+      new Discord.MessageEmbed()
+      .setTitle('Tic Tac Toe Bot Invite')
+      .setColor('#b00b1e')
+      .setDescription('Invite the bot using [this link!](https://discord.com/api/oauth2/authorize?client_id=762833969183326228&permissions=2048&scope=bot)')
+    )
+  }
+
+  if(cmd == 'uptime'){
+    message.channel.send(
+      new Discord.MessageEmbed()
+      .setTitle('Uptime')
+      .setColor('#b00b1e')
+      .setDescription(`**Ready Since**\n${bot.readyAt}\n**Uptme**\n${toHMS(Date.now()-bot.readyTimestamp)}`)
     )
   }
 })
