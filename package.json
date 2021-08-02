@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Robert Offord",
+  "license": "MIT",
   "dependencies": {
     "dblapi.js": "^2.4.1",
     "discord.js": "^12.4.1",
