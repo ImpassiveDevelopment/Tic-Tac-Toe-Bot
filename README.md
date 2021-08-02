@@ -14,7 +14,7 @@ After making an application and generating a bot, you are ready to clone the rep
 ## Repo Cloning
 Open your terminal and go to the directory you want your project's subfolder to be inside and type the following commands:<br/>
 ```
-git clone https://github.com/ImpassiveMoon03/pokevers-events-tracker
+git clone https://github.com/ImpassiveMoon03/tic-tac-toe-bot
 cd tic-tac-toe-bot
 ```
 After cloning the repository, enter index.js and replace "TOKEN" with your bot's token
