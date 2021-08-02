@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
 const fs = require('fs');
 const DBL = require("dblapi.js");
+const package = require('./package.json')
 
 
 var games = new Map()
@@ -33,7 +34,7 @@ function toHMS(ms){
   var hours = parseInt( seconds / 3600 );
   seconds = seconds % 3600;
   var minutes = parseInt( seconds / 60 );
-  seconds = seconds % 60;
+  seconds = Math.ceil(seconds % 60);
   return hours+":"+checkTime(minutes)+":"+checkTime(seconds);
 }
 
@@ -72,7 +73,7 @@ bot.on('message', async message => {
       .addField(`${prefix}say <something>`, '*Requires bot and executor to have `MANAGE_MESSAGES` permission*\nHave the bot repeat the message you sent\n**Something** - Any text')
       .addField(`${prefix}how`, "Get a small how-to of tic-tac-toe")
       .addField(`${prefix}invite`, "Get the bot invite link")
-      .addField(`${prefix}uptime`, "View the bot's current runtime")
+      .addField(`${prefix}stats {options}`, "View some stats on the bot\n**Options** - Focus on one area, uptime, ping, or development")
       .setDescription("Want to support development? [Upote the bot on top.gg](https://top.gg/bot/762833969183326228/vote)")
       .setFooter('<> - Required Arguments || {} - Optional Arguments')
     )
@@ -244,13 +245,51 @@ bot.on('message', async message => {
     )
   }
 
-  if(cmd == 'uptime'){
-    message.channel.send(
-      new Discord.MessageEmbed()
-      .setTitle('Uptime')
-      .setColor('#b00b1e')
-      .setDescription(`**Ready Since**\n${bot.readyAt}\n**Uptme**\n${toHMS(Date.now()-bot.readyTimestamp)}`)
-    )
+  if(cmd == 'stats'){
+    let option = args[0]
+    if(!option){
+      let dependencies = []
+      for(var i in Object.keys(package.dependencies)){
+        dependencies.push(`${Object.keys(package.dependencies)[i]}@${package.dependencies[Object.keys(package.dependencies)[i]]}`)
+      }
+      message.channel.send(
+        new Discord.MessageEmbed()
+        .setTitle("Tic-Tac-Toe Stats")
+        .setColor('#b00b1e')
+        .setDescription(`Uptime - ${toHMS(Date.now()-bot.readyTimestamp)}`)
+        .addField('Ready Since', bot.readyAt)
+        .addField('Message Ping', `${message.createdTimestamp - Date.now()}ms`)
+        .addField('API Ping', `${Math.round(bot.ws.ping)}ms`)
+        .addField('Code Version', `v${package.version}`)
+        .addField('Dependencies', dependencies.join('\n'))
+        .setFooter(`For only one field, do ${prefix}stats {option}`)
+      )
+    }else if(option.toLowerCase() == 'uptime'){
+      message.channel.send(
+        new Discord.MessageEmbed()
+        .setTitle('Uptime')
+        .setColor('#b00b1e')
+        .setDescription(`**Ready Since**\n${bot.readyAt}\n**Uptme**\n${toHMS(Date.now()-bot.readyTimestamp)}`)
+      )
+    }else if(option.toLowerCase() == 'ping'){
+      message.channel.send(
+        new Discord.MessageEmbed()
+        .setTitle('Latency')
+        .setColor('#b00b1e')
+        .setDescription(`**Message Ping**\n${message.createdTimestamp -  Date.now()}ms\n**API Ping**\n${Math.round(bot.ws.ping)}ms`)
+      )
+    }else if(option.toLowerCase() == 'development'){
+      let dependencies = []
+      for(var i in Object.keys(package.dependencies)){
+        dependencies.push(`${Object.keys(package.dependencies)[i]}@${package.dependencies[Object.keys(package.dependencies)[i]]}`)
+      }
+      message.channel.send(
+        new Discord.MessageEmbed()
+        .setTitle('Development Information')
+        .setColor('#b00b1e')
+        .setDescription(`**Code Version**\nv${package.version}\n**Dependencies**\n${dependencies.join('\n')}`)
+      )
+    }
   }
 })
 
