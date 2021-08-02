@@ -236,6 +236,8 @@ bot.on('message', async message => {
 
   if(cmd == 'stats'){
     let option = args[0]
+    let ready = new Date(bot.readyTimestamp)
+    let readystring = `${ready.getMonth()}/${ready.getDate()}/${ready.getFullYear()} at ${ready.getHours()}:${ready.getMinutes()}`
     if(!option){
       let dependencies = []
       for(var i in Object.keys(package.dependencies)){
@@ -246,7 +248,7 @@ bot.on('message', async message => {
         .setTitle("Tic-Tac-Toe Stats")
         .setColor('#b00b1e')
         .setDescription(`Uptime - ${toHMS(Date.now()-bot.readyTimestamp)}`)
-        .addField('Ready Since', bot.readyAt)
+        .addField('Ready Since', readystring)
         .addField('Message Ping', `${message.createdTimestamp - Date.now()}ms`)
         .addField('API Ping', `${Math.round(bot.ws.ping)}ms`)
         .addField('Code Version', `v${package.version}`)
@@ -258,7 +260,7 @@ bot.on('message', async message => {
         new Discord.MessageEmbed()
         .setTitle('Uptime')
         .setColor('#b00b1e')
-        .setDescription(`**Ready Since**\n${bot.readyAt}\n**Uptme**\n${toHMS(Date.now()-bot.readyTimestamp)}`)
+        .setDescription(`**Ready Since**\n${readystring}\n**Uptme**\n${toHMS(Date.now()-bot.readyTimestamp)}`)
       )
     }else if(option.toLowerCase() == 'ping'){
       message.channel.send(
