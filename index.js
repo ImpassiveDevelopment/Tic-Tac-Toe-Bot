@@ -1,3 +1,4 @@
+require('dotenv').config()
 const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
 const fs = require('fs');
@@ -296,4 +297,4 @@ bot.on('messageCreate', async message => {
   }
 })
 
-bot.login('TOKEN')
+bot.login(process.env.TOKEN)

@@ -1,16 +1,17 @@
 {
   "name": "tic-tac-toe",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "setup": "touch .env && echo \"TOKEN=bot_token\" >> .env"
   },
   "author": "Robert Offord",
   "license": "MIT",
   "dependencies": {
     "dblapi.js": "^2.4.1",
     "discord.js": "^13.0.0-dev.t1627906063.6e0ea02",
+    "dotenv": "^10.0.0",
     "tic-tac-nano-2": "^1.0.5"
   }
 }
