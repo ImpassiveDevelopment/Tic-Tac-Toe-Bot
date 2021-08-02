@@ -115,7 +115,7 @@ bot.on('message', async message => {
     )
   }
 
-  if(cmd === 'move'){
+  if(cmd === 'move' || cmd == 'm'){
     let move = args[0];
     if(!games.has(`${message.author.id}`)){
       return message.channel.send('You are not in a game!')
@@ -123,6 +123,15 @@ bot.on('message', async message => {
     if(!args[0]){
       return message.channel.send('You must specify a move')
     }
+    if(args[0].toLowerCase() == '1a') move = 'A1'
+    if(args[0].toLowerCase() == '1b') move = 'B1'
+    if(args[0].toLowerCase() == '1c') move = 'C1'
+    if(args[0].toLowerCase() == '2a') move = 'A2'
+    if(args[0].toLowerCase() == '2b') move = 'B2'
+    if(args[0].toLowerCase() == '2c') move = 'C2'
+    if(args[0].toLowerCase() == '3a') move = 'A3'
+    if(args[0].toLowerCase() == '3b') move = 'B3'
+    if(args[0].toLowerCase() == '3c') move = 'C3'
     move = move.split('')
     move[0] = move[0].toUpperCase()
     let mo = move.join('')
@@ -160,7 +169,7 @@ bot.on('message', async message => {
             tic.turnPlayer = tic.xPlayer
           }
         }
-        message.channel.send(embed)
+        message.channel.send(`<@!${tic.turnPlayer[0]}>`, {embed:embed})
       }
     }
   }
