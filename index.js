@@ -69,7 +69,7 @@ bot.on('message', async message => {
       .addField(`${prefix}move <square>`, "Take your turne\n**Square** - A valid space on the board")
       .addField(`${prefix}end`, "End your current game")
       .addField(`${prefix}board`, "View your current game's board")
-      .addField(`${prefix}say <something>`, '*Requires bot and executor to have `MANAGE_MESSAGES` permission*\nHave the bot repeat the message you sent\b**Something** - Any text')
+      .addField(`${prefix}say <something>`, '*Requires bot and executor to have `MANAGE_MESSAGES` permission*\nHave the bot repeat the message you sent\n**Something** - Any text')
       .addField(`${prefix}how`, "Get a small how-to of tic-tac-toe")
       .addField(`${prefix}invite`, "Get the bot invite link")
       .addField(`${prefix}uptime`, "View the bot's current runtime")
