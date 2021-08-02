@@ -110,10 +110,8 @@ bot.on('message', async message => {
       new Discord.MessageEmbed()
       .setTitle(`Tic Tac Toe`)
       .setColor('#b00b1e')
-      .setDescription(`
-      ${message.member.user.username} vs. ${member.user.username}
-      ${tic.game.visualize()}
-      `)
+      .setDescription(`${message.member} vs. ${member}`)
+      .addField('Game Board', tic.game.visualize())
     )
   }
 
@@ -141,21 +139,18 @@ bot.on('message', async message => {
       if(a === false){
         return message.channel.send('Invalid Move')
       }else{
-        message.channel.send(new Discord.MessageEmbed()
-          .setTitle(`Tic Tac Toe`)
-          .setColor('#b00b1e')
-          .setDescription(`
-          ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
-          ${tic.game.visualize()}
-          `)
-        )
+        let embed = new Discord.MessageEmbed()
+        .setTitle(`Tic Tac Toe`)
+        .setColor('#b00b1e')
+        .setDescription(`${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}`)
+        .addField('Game Board', tic.game.visualize())
         if(tic.game.didWin() != false && tic.game.didWin() != 'No one Wins'){
-          message.channel.send(tic.game.didWin()+'\n***Game Movelog***\n'+tic.game.moveLog.join('\n'))
+          embed.addField('Movelog', tic.game.moveLog.join('\n'))
           games.delete(tic.xPlayer[0])
           games.delete(tic.oPlayer[0])
         //Turns out, I forgot to put the draw condition smh
         }else if(tic.game.board.A1!='' && tic.game.board.A2!='' && tic.game.board.A3!='' && tic.game.board.B1!='' && tic.game.board.B2!='' && tic.game.board.B3!='' && tic.game.board.C1!='' && tic.game.board.C2!='' && tic.game.board.C3!=''){
-          message.channel.send('No Winner'+'\n***Game Movelog***\n'+tic.game.moveLog.join('\n'))
+          embed.addField('No Winner - Movelog', tic.game.moveLog.join('\n'))
           games.delete(tic.xPlayer[0])
           games.delete(tic.oPlayer[0])
         }else{
@@ -165,6 +160,7 @@ bot.on('message', async message => {
             tic.turnPlayer = tic.xPlayer
           }
         }
+        message.channel.send(embed)
       }
     }
   }
@@ -181,13 +177,9 @@ bot.on('message', async message => {
       new Discord.MessageEmbed()
       .setTitle(`Game Ended by ${message.author.username}`)
       .setColor('#b00b1e')
-      .setDescription(`
-        ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
-        ${tic.game.visualize()}
-
-        **Movelog**
-        ${tic.game.moveLog.join('\n')}
-      `)
+      .setDescription(`${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}`)
+      .addField('Game Board', tic.game.visualize())
+      .addField('Movelog', tic.game.moveLog.join('\n'))
     )
   }
 
@@ -202,10 +194,8 @@ bot.on('message', async message => {
       new Discord.MessageEmbed()
       .setTitle(`Tic Tac Toe`)
       .setColor('#b00b1e')
-      .setDescription(`
-        ${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}
-        ${tic.game.visualize()}
-      `)
+      .setDescription(`${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}`)
+      .addField('Game Board', tic.game.visualize())
     )
   }
 
@@ -222,17 +212,7 @@ bot.on('message', async message => {
       new Discord.MessageEmbed()
       .setTitle('How to play Tic Tac Toe')
       .setColor('#b00b1e')
-      .setDescription(`
-      Tic Tac Toe is played on a 3x3 grid of squares:
-      \` \` 1️⃣ 2️⃣ 3️⃣
-      \`A\` ⬛|⬛|⬛
-      \`B\` ⬛|⬛|⬛
-      \`C\` ⬛|⬛|⬛
-
-      One player is an x, and one player is an o. Both of you compete to have three letter in a row before the other player. You take turns by putting your letter in an empty square.
-
-      When all 9 squares are occupied, the game is over. If neither player has three of their letters in a row, the game is a draw.
-      `)
+      .setDescription(`Tic Tac Toe is played on a 3x3 grid of squares:\n\` \` 1️⃣ 2️⃣ 3️⃣\n\`A\` ⬛|⬛|⬛\n\`B\` ⬛|⬛|⬛\n\`C\` ⬛|⬛|⬛\n\nOne player is an x, and one player is an o. Both of you compete to have three letter in a row before the other player. You take turns by putting your letter in an empty square.\n\nWhen all 9 squares are occupied, the game is over. If neither player has three of their letters in a row, the game is a draw.`)
     )
   }
 
