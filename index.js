@@ -201,7 +201,7 @@ bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user.tag} in ${bot.guilds.cache.size} servers`)
 	bot.user.setActivity({
 		type: "WATCHING",
-		name: `DM To Contact Developer!`
+		name: `t!help || DM To Contact Developer!`
 	})
 })
 
@@ -243,9 +243,10 @@ bot.on('messageCreate', async message => {
           .setDescription(args.slice(1).join(' '))
         ]
       })
+      message.channel.send('Message Delivered!')
     }
   }
-  if(!cmd.startsWith(prefix)) return;
+  if(!cmd.toLowerCase().startsWith(prefix)) return;
   cmd = cmd.toLowerCase().split('').slice(prefix.length).join('')
 
   if(cmd === 'help'){
