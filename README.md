@@ -17,7 +17,12 @@ Open your terminal and go to the directory you want your project's subfolder to 
 git clone https://github.com/ImpassiveMoon03/tic-tac-toe-bot
 cd tic-tac-toe-bot
 ```
-After cloning the repository, enter index.js and replace "TOKEN" with your bot's token
+Then, run the following commands to install te dependencies and get setup:<br/>
+```
+npm install
+npm run setup
+```
+After running setup, enter the newly created ".env" file and replace bot_token with your application's token
 
 ## Author
 [Robert Offord](https://github.com/ImpassiveMoon03)
