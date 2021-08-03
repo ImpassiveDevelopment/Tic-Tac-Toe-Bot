@@ -3,7 +3,158 @@ const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
 const fs = require('fs');
 const DBL = require("dblapi.js");
-const package = require('./package.json')
+const package = require('./package.json');
+const ticTacNano = require('tic-tac-nano-2');
+
+function mov(message, interaction, args, games, prefix){
+  let move = args[0];
+  if(!games.has(`${message.author.id}`)){
+    return message.channel.send('You are not in a game!')
+  }
+  if(!args[0]){
+    return message.channel.send('You must specify a move')
+  }
+  if(args[0].toLowerCase() == '1a') move = 'A1'
+  if(args[0].toLowerCase() == '1b') move = 'B1'
+  if(args[0].toLowerCase() == '1c') move = 'C1'
+  if(args[0].toLowerCase() == '2a') move = 'A2'
+  if(args[0].toLowerCase() == '2b') move = 'B2'
+  if(args[0].toLowerCase() == '2c') move = 'C2'
+  if(args[0].toLowerCase() == '3a') move = 'A3'
+  if(args[0].toLowerCase() == '3b') move = 'B3'
+  if(args[0].toLowerCase() == '3c') move = 'C3'
+  move = move.split('')
+  move[0] = move[0].toUpperCase()
+  let mo = move.join('')
+
+  if(!validMoves.has(mo)){
+    return message.channel.send('That is not a valid tic tac toe board square')
+  }
+  let player = games.get(`${interaction.user.id}`);
+  let tic = gameStates.get(player.gameId)
+  if(interaction.user.id != tic.turnPlayer[0]){
+    return message.channel.send('It is not your turn')
+  }else{
+    let a = tic.game.turn(mo, tic.turnPlayer[1])
+    if(a === false){
+      return message.channel.send('Invalid Move')
+    }else{
+      let embed = new Discord.MessageEmbed()
+      .setTitle(`Tic Tac Toe`)
+      .setColor('#b00b1e')
+      .setDescription(`${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}`)
+      if(tic.game.didWin() != false && tic.game.didWin() != 'No one Wins'){
+        embed.addField('Game Board', tic.game.visualize())
+        embed.addField('Movelog', tic.game.moveLog.join('\n'))
+        games.delete(tic.xPlayer[0])
+        games.delete(tic.oPlayer[0])
+        return message.channel.send({embeds: [embed]})
+      //Turns out, I forgot to put the draw condition smh
+      }else if(tic.game.board.A1!='' && tic.game.board.A2!='' && tic.game.board.A3!='' && tic.game.board.B1!='' && tic.game.board.B2!='' && tic.game.board.B3!='' && tic.game.board.C1!='' && tic.game.board.C2!='' && tic.game.board.C3!=''){
+        embed.addField('Game Board', tic.game.visualize())
+        embed.addField('No Winner - Movelog', tic.game.moveLog.join('\n'))
+        games.delete(tic.xPlayer[0])
+        games.delete(tic.oPlayer[0])
+        return message.channel.send({embeds: [embed]})
+      }else{
+        if(tic.turnPlayer === tic.xPlayer){
+          tic.turnPlayer = tic.oPlayer
+        }else{
+          tic.turnPlayer = tic.xPlayer
+        }
+      }
+      const buttons = {
+        A1: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.A1] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('A1'),
+        A2: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.A2] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('A2'),
+        A3: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.A3] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('A3'),
+        B1: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.B1] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('B1'),
+        B2: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.B2] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('B2'),
+        B3: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.B3] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('B3'),
+        C1: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.C1] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('C1'),
+        C2: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.C2] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('C2'),
+        C3: new Discord.MessageButton()
+        .setLabel(tic.game.emojis[tic.game.board.C3] || '⬛')
+        .setStyle('SECONDARY')
+        .setCustomId('C3')
+      }
+      const rowA = new Discord.MessageActionRow()
+      .addComponents([buttons.A1,buttons.A2,buttons.A3])
+      const rowB = new Discord.MessageActionRow()
+      .addComponents([buttons.B1,buttons.B2,buttons.B3])
+      const rowC = new Discord.MessageActionRow()
+      .addComponents([buttons.C1,buttons.C2,buttons.C3])
+  
+      message.channel.send({
+        content: `<@!${tic.turnPlayer[0]}>`,
+        embeds: [
+          embed
+        ],
+        components: [
+          rowA,
+          rowB,
+          rowC
+        ]
+      }).then((m) => {
+        const collector = m.createMessageComponentCollector({ componentType: 'BUTTON', time: 60000 });
+        collector.on('collect', i => {
+          if(i.user.id != tic.turnPlayer[0]){
+            i.deferUpdate()
+            i.reply({content: `Only <@!${tic.turnPlayer}> can use these buttons!`, ephemeral: true})
+          }else{
+            i.deferUpdate()
+            collector.stop(i.customId)
+            mov(message, i, [i.customId], games, prefix)
+          }
+        })
+        collector.on('end', (c, r) => {
+          if(r != null){
+            m.edit({
+              embeds: [
+                embed
+                .addField('Game Board', tic.game.visualize())
+              ],
+              components: []
+            })
+          }
+          else{
+            m.edit({
+              content: `The buttons will no longer work, so they have been removed. You can still continue the game using the \`${prefix}move\` command!`,
+              embeds: [
+                embed
+                .addField('Game Board', tic.game.visualize())
+              ],
+              components: []
+            })
+          }
+        })
+      })
+    }
+  }
+}
 
 
 var games = new Map()
@@ -109,74 +260,107 @@ bot.on('messageCreate', async message => {
     gameStates.get(no).turnPlayer = gameStates.get(no).xPlayer;
     let tic = gameStates.get(no);
     no++;
+    const buttons = {
+      A1: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.A1] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('A1'),
+      A2: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.A2] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('A2'),
+      A3: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.A3] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('A3'),
+      B1: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.B1] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('B1'),
+      B2: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.B2] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('B2'),
+      B3: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.B3] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('B3'),
+      C1: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.C1] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('C1'),
+      C2: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.C2] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('C2'),
+      C3: new Discord.MessageButton()
+      .setLabel(tic.game.emojis[tic.game.board.C3] || '⬛')
+      .setStyle('SECONDARY')
+      .setCustomId('C3')
+    }
+    const rowA = new Discord.MessageActionRow()
+    .addComponents([buttons.A1,buttons.A2,buttons.A3])
+    const rowB = new Discord.MessageActionRow()
+    .addComponents([buttons.B1,buttons.B2,buttons.B3])
+    const rowC = new Discord.MessageActionRow()
+    .addComponents([buttons.C1,buttons.C2,buttons.C3])
+
     message.channel.send({
       embeds: [
         new Discord.MessageEmbed()
         .setTitle(`Tic Tac Toe`)
         .setColor('#b00b1e')
         .setDescription(`${message.member} vs. ${member}`)
-        .addField('Game Board', tic.game.visualize())
+      ],
+      components: [
+        rowA,
+        rowB,
+        rowC
       ]
+    }).then((m) => {
+      const collector = m.createMessageComponentCollector({ componentType: 'BUTTON', time: 60000 });
+      collector.on('collect', i => {
+        if(i.user.id != message.author.id){
+          i.deferUpdate()
+          i.reply({content: `Only ${message.author.tag} can use these buttons!`, ephemeral: true})
+        }else{
+          i.deferUpdate()
+          collector.stop(i.customId)
+        }
+      })
+      collector.on('end', (c, r) => {
+        if(r != null){
+          mov(message, {user:{id:message.author.id}}, [r], games, prefix)
+          m.edit({
+            embeds: [
+              new Discord.MessageEmbed()
+              .setTitle(`Tic Tac Toe`)
+              .setColor('#b00b1e')
+              .setDescription(`${message.member} vs. ${member}`)
+              .addField('Game Board', tic.game.visualize())
+            ],
+            components: []
+          })
+        }
+        else{
+          m.edit({
+            content: `The buttons will no longer work, so they have been removed. You can still continue the game using the \`${prefix}move\` command!`,
+            embeds: [
+              new Discord.MessageEmbed()
+              .setTitle(`Tic Tac Toe`)
+              .setColor('#b00b1e')
+              .setDescription(`${message.member} vs. ${member}`)
+              .addField('Game Board', tic.game.visualize())
+            ],
+            components: []
+          })
+        }
+      })
     })
   }
 
   if(cmd === 'move' || cmd == 'm'){
-    let move = args[0];
-    if(!games.has(`${message.author.id}`)){
-      return message.channel.send('You are not in a game!')
-    }
-    if(!args[0]){
-      return message.channel.send('You must specify a move')
-    }
-    if(args[0].toLowerCase() == '1a') move = 'A1'
-    if(args[0].toLowerCase() == '1b') move = 'B1'
-    if(args[0].toLowerCase() == '1c') move = 'C1'
-    if(args[0].toLowerCase() == '2a') move = 'A2'
-    if(args[0].toLowerCase() == '2b') move = 'B2'
-    if(args[0].toLowerCase() == '2c') move = 'C2'
-    if(args[0].toLowerCase() == '3a') move = 'A3'
-    if(args[0].toLowerCase() == '3b') move = 'B3'
-    if(args[0].toLowerCase() == '3c') move = 'C3'
-    move = move.split('')
-    move[0] = move[0].toUpperCase()
-    let mo = move.join('')
-
-    if(!validMoves.has(mo)){
-      return message.channel.send('That is not a valid tic tac toe board square')
-    }
-    let player = games.get(`${message.author.id}`);
-    let tic = gameStates.get(player.gameId)
-    if(message.author.id != tic.turnPlayer[0]){
-      return message.channel.send('It is not your turn')
-    }else{
-      let a = tic.game.turn(mo, tic.turnPlayer[1])
-      if(a === false){
-        return message.channel.send('Invalid Move')
-      }else{
-        let embed = new Discord.MessageEmbed()
-        .setTitle(`Tic Tac Toe`)
-        .setColor('#b00b1e')
-        .setDescription(`${message.guild.members.cache.get(tic.xPlayer[0])} vs. ${message.guild.members.cache.get(tic.oPlayer[0])}`)
-        .addField('Game Board', tic.game.visualize())
-        if(tic.game.didWin() != false && tic.game.didWin() != 'No one Wins'){
-          embed.addField('Movelog', tic.game.moveLog.join('\n'))
-          games.delete(tic.xPlayer[0])
-          games.delete(tic.oPlayer[0])
-        //Turns out, I forgot to put the draw condition smh
-        }else if(tic.game.board.A1!='' && tic.game.board.A2!='' && tic.game.board.A3!='' && tic.game.board.B1!='' && tic.game.board.B2!='' && tic.game.board.B3!='' && tic.game.board.C1!='' && tic.game.board.C2!='' && tic.game.board.C3!=''){
-          embed.addField('No Winner - Movelog', tic.game.moveLog.join('\n'))
-          games.delete(tic.xPlayer[0])
-          games.delete(tic.oPlayer[0])
-        }else{
-          if(tic.turnPlayer === tic.xPlayer){
-            tic.turnPlayer = tic.oPlayer
-          }else{
-            tic.turnPlayer = tic.xPlayer
-          }
-        }
-        message.channel.send({content: `<@!${tic.turnPlayer[0]}>`,embeds:[embed]})
-      }
-    }
+    mov(message, {user:{id:message.author.id}}, args, games)
   }
 
   if(cmd === 'end'){
