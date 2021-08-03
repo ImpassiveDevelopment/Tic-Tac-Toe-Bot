@@ -407,6 +407,7 @@ bot.on('messageCreate', async message => {
     let tic = gameStates.get(p.gameId)
     games.delete(`${tic.xPlayer[0]}`)
     games.delete(`${tic.oPlayer[0]}`)
+    tic.game.moveLog.push(`${message.author.username} ended the game!`)
     message.channel.send({
       embeds: [
         new Discord.MessageEmbed()
