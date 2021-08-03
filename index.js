@@ -172,7 +172,14 @@ validMoves.add('A3')
 validMoves.add('B3')
 validMoves.add('C3')
 
-const bot = new Discord.Client({intents: new Discord.Intents(771)})
+let intents = new Discord.Intents()
+.add('DIRECT_MESSAGES')
+.add('GUILDS')
+.add('GUILD_MESSAGES')
+.add('GUILD_MEMBERS')
+.add('GUILD_PRESENCES')
+console.log(intents)
+const bot = new Discord.Client({intents: intents, partials: ['MESSAGE', 'CHANNEL', 'REACTION']})
 
 function checkTime(i) {
   if (i < 10) {
@@ -194,21 +201,50 @@ bot.on('ready', async () => {
   console.log(`Logged in as ${bot.user.tag} in ${bot.guilds.cache.size} servers`)
 	bot.user.setActivity({
 		type: "WATCHING",
-		name: `For t!help in ${bot.guilds.cache.size} servers`
+		name: `DM To Contact Developer!`
 	})
-  setInterval(() => {
-    bot.user.setActivity({
-      type: 'WATCHING',
-      name: `For t!help in ${bot.guilds.cache.size} servers`
-    })
-  }, 60000)
+})
+
+bot.on('guildCreate', (guild) => {
+  bot.channels.cache.get('872007635245862913').send(`I have been added to the guild \`${guild.name}\`\nServer Count - ${bot.guilds.cache.size}`)
+})
+
+bot.on('guildDelete', (guild) => {
+  bot.channels.cache.get('872007635245862913').send(`I have been removed from the guild \`${guild.name}\`\nServer Count - ${bot.guilds.cache.size}`)
 })
 
 bot.on('messageCreate', async message => {
-  let prefix = '!';
+  if(message.channel.type == 'DM'){
+    if(message.author.bot) return;
+    let embed = new Discord.MessageEmbed()
+    .setTitle(`Mesage from \`${message.author.tag}\``)
+    .setColor('#b00b1e')
+    .setDescription(message.content)
+    .setFooter(`Run the command \`tictactoe-reply ${message.author.id}\` to respond!`)
+    message.channel.send('Message Sent!')
+    let channel = bot.channels.cache.get('872006358654943232')
+    channel.send({embeds: [embed]})
+  }
+  let prefix = 't!';
   let arr = message.content.split(' ')
   let cmd = arr[0];
   let args = arr.slice(1)
+  if(message.content.startsWith('tictactoe-reply')){
+    if(message.author.id != '558800844343214090') return
+    if(!bot.users.cache.has(args[0])) return message.channel.send('I do not have conteact with that member!')
+    else{
+      let user = bot.users.cache.get(args[0])
+      console.log(user)
+      user.send({
+        embeds: [
+          new Discord.MessageEmbed()
+          .setTitle('Response from Developer')
+          .setColor('#b00b1e')
+          .setDescription(args.slice(1).join(' '))
+        ]
+      })
+    }
+  }
   if(!cmd.startsWith(prefix)) return;
   cmd = cmd.toLowerCase().split('').slice(prefix.length).join('')
 
