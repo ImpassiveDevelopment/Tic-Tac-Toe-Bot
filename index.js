@@ -204,19 +204,19 @@ bot.on('ready', async () => {
 		name: `t!help || DM To Contact Developer!`
 	})
 
-  bot.guilds.application.commands.create({
+  bot.application.commands.create({
     name: 'help',
     description: 'View the help embed'
   })
-  bot.guilds.application.commands.create({
+  bot.application.commands.create({
     name: 'how',
     description: 'Learn how to play tic-tac-toe'
   })
-  bot.guilds.application.commands.create({
+  bot.application.commands.create({
     name: 'invite',
     description: 'Get the bot\'s invite link'
   })
-  bot.guilds.application.commands.create({
+  bot.application.commands.create({
     name: 'stats',
     description: 'View various statistics on the bot',
     options: [{
