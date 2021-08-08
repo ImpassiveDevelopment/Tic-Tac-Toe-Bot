@@ -203,6 +203,133 @@ bot.on('ready', async () => {
 		type: "WATCHING",
 		name: `t!help || DM To Contact Developer!`
 	})
+
+  bot.guilds.cache.get('866969279092883456').commands.create({
+    name: 'help',
+    description: 'View the help embed'
+  })
+  bot.guilds.cache.get('866969279092883456').commands.create({
+    name: 'how',
+    description: 'Learn how to play tic-tac-toe'
+  })
+  bot.guilds.cache.get('866969279092883456').commands.create({
+    name: 'invite',
+    description: 'Get the bot\'s invite link'
+  })
+  bot.guilds.cache.get('866969279092883456').commands.create({
+    name: 'stats',
+    description: 'View various statistics on the bot',
+    options: [{
+      name: 'options',
+      description: 'Which area of statistics you want to view',
+      type: "STRING",
+      required: false,
+      choices: [
+        {name: 'uptime', value: 'uptime'},{name: 'ping', value: 'ping'},{name: 'development', value: 'development'}
+      ]
+    }]
+  })
+})
+
+bot.on('interactionCreate', async interaction => {
+  if(!interaction.isCommand()) return
+  else{
+    if(interaction.command.name == 'help'){
+      interaction.reply({
+        embeds: [
+          new Discord.MessageEmbed()
+          .setTitle('Tic Tac Toe')
+          .setColor('#b00b1e')
+          .addField(`help <:slash:873820777932279828>`, 'View the help embed')
+          .addField(`game <member>`, "Start a game with the selected memeber\n**Member** - The ID or mention of a member")
+          .addField(`move <square>`, "Take your turne\n**Square** - A valid space on the board")
+          .addField(`end`, "End your current game")
+          .addField(`board`, "View your current game's board")
+          .addField(`how <:slash:873820777932279828>`, "Get a small how-to of tic-tac-toe")
+          .addField(`invite <:slash:873820777932279828>`, "Get the bot invite link")
+          .addField(`stats {options} <:slash:873820777932279828>`, "View some stats on the bot\n**Options** - Focus on one area, uptime, ping, or development")
+          .setDescription("Want to support development? [Upote the bot on top.gg](https://top.gg/bot/762833969183326228/vote)\n<:slash:873820777932279828> - Available in slash command form")
+          .setFooter('<> - Required Arguments || {} - Optional Arguments')
+        ],
+        ephemeral: true
+      })
+    }else if(interaction.command.name == 'how'){
+      interaction.reply({
+        embeds: [
+          new Discord.MessageEmbed()
+          .setTitle('How to play Tic Tac Toe')
+          .setColor('#b00b1e')
+          .setDescription(`Tic Tac Toe is played on a 3x3 grid of squares:\n\` \` 1️⃣ 2️⃣ 3️⃣\n\`A\` ⬛|⬛|⬛\n\`B\` ⬛|⬛|⬛\n\`C\` ⬛|⬛|⬛\n\nOne player is an x, and one player is an o. Both of you compete to have three letter in a row before the other player. You take turns by putting your letter in an empty square.\n\nWhen all 9 squares are occupied, the game is over. If neither player has three of their letters in a row, the game is a draw.`)
+        ],
+        ephemeral: true
+      })
+    }else if(interaction.command.name == 'invite'){
+      interaction.reply({
+        embeds: [
+          new Discord.MessageEmbed()
+          .setTitle('Tic Tac Toe Bot Invite')
+          .setColor('#b00b1e')
+          .setDescription('Invite the bot using [this link!](https://discord.com/api/oauth2/authorize?client_id=762833969183326228&permissions=2048&scope=bot%20applications.commands)')
+        ],
+        ephemeral: true
+      })
+    }else if(interaction.command.name == 'stats'){
+      let option = interaction.options.get('options')
+      let dependencies = []
+      for(var i in Object.keys(package.dependencies)){
+        dependencies.push(`${Object.keys(package.dependencies)[i]}@${package.dependencies[Object.keys(package.dependencies)[i]]}`)
+      }
+      let ready = new Date(bot.readyTimestamp)
+      let readystring = `${ready.getMonth()}/${ready.getDate()}/${ready.getFullYear()} at ${ready.getHours()}:${ready.getMinutes()}`
+      if(option == null){
+        interaction.reply({
+          embeds: [
+            new Discord.MessageEmbed()
+            .setTitle("Tic-Tac-Toe Stats")
+            .setColor('#b00b1e')
+            .setDescription(`Uptime - ${toHMS(Date.now()-bot.readyTimestamp)}`)
+            .addField('Ready Since', readystring)
+            .addField('Message Ping', `${interaction.createdTimestamp - Date.now()}ms`)
+            .addField('API Ping', `${Math.round(bot.ws.ping)}ms`)
+            .addField('Code Version', `v${package.version}`)
+            .addField('Dependencies', dependencies.join('\n'))
+            .setFooter(`For only one field, do stats {option}`)
+          ],
+          ephemeral: true
+        })
+      }else if(option.value == 'uptime'){
+        interaction.reply({
+          embeds: [
+            new Discord.MessageEmbed()
+            .setTitle('Uptime')
+            .setColor('#b00b1e')
+            .setDescription(`**Ready Since**\n${readystring}\n**Uptme**\n${toHMS(Date.now()-bot.readyTimestamp)}`)
+          ],
+          ephemeral: true
+        })
+      }else if(option.value == 'ping'){
+        interaction.reply({
+          embeds: [
+            new Discord.MessageEmbed()
+            .setTitle('Latency')
+            .setColor('#b00b1e')
+            .setDescription(`**Message Ping**\n${interaction.createdTimestamp -  Date.now()}ms\n**API Ping**\n${Math.round(bot.ws.ping)}ms`)
+          ],
+          ephemeral: true
+        })
+      }else if(option.value == 'development'){
+        interaction.reply({
+          embeds: [
+            new Discord.MessageEmbed()
+            .setTitle('Development Information')
+            .setColor('#b00b1e')
+            .setDescription(`**Code Version**\nv${package.version}\n**Dependencies**\n${dependencies.join('\n')}`)
+          ],
+          ephemeral: true
+        })
+      }
+    }
+  }
 })
 
 bot.on('guildCreate', (guild) => {
@@ -255,16 +382,15 @@ bot.on('messageCreate', async message => {
         new Discord.MessageEmbed()
         .setTitle('Tic Tac Toe')
         .setColor('#b00b1e')
-        .addField(`${prefix}help`, 'View the help embed')
+        .addField(`${prefix}help <:slash:873820777932279828>`, 'View the help embed')
         .addField(`${prefix}game <member>`, "Start a game with the selected memeber\n**Member** - The ID or mention of a member")
         .addField(`${prefix}move <square>`, "Take your turne\n**Square** - A valid space on the board")
         .addField(`${prefix}end`, "End your current game")
         .addField(`${prefix}board`, "View your current game's board")
-        .addField(`${prefix}say <something>`, '*Requires bot and executor to have `MANAGE_MESSAGES` permission*\nHave the bot repeat the message you sent\n**Something** - Any text')
-        .addField(`${prefix}how`, "Get a small how-to of tic-tac-toe")
-        .addField(`${prefix}invite`, "Get the bot invite link")
-        .addField(`${prefix}stats {options}`, "View some stats on the bot\n**Options** - Focus on one area, uptime, ping, or development")
-        .setDescription("Want to support development? [Upote the bot on top.gg](https://top.gg/bot/762833969183326228/vote)")
+        .addField(`${prefix}how <:slash:873820777932279828>`, "Get a small how-to of tic-tac-toe")
+        .addField(`${prefix}invite <:slash:873820777932279828>`, "Get the bot invite link")
+        .addField(`${prefix}stats {options} <:slash:873820777932279828>`, "View some stats on the bot\n**Options** - Focus on one area, uptime, ping, or development")
+        .setDescription("Want to support development? [Upote the bot on top.gg](https://top.gg/bot/762833969183326228/vote)\n<:slash:873820777932279828> - Available in slash command form")
         .setFooter('<> - Required Arguments || {} - Optional Arguments')
       ]
     })
@@ -456,7 +582,7 @@ bot.on('messageCreate', async message => {
         new Discord.MessageEmbed()
         .setTitle('Tic Tac Toe Bot Invite')
         .setColor('#b00b1e')
-        .setDescription('Invite the bot using [this link!](https://discord.com/api/oauth2/authorize?client_id=762833969183326228&permissions=2048&scope=bot)')
+        .setDescription('Invite the bot using [this link!](https://discord.com/api/oauth2/authorize?client_id=762833969183326228&permissions=2048&scope=bot%20applications.commands)')
       ]
     })
   }
