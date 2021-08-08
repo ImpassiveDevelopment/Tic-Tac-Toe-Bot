@@ -204,19 +204,19 @@ bot.on('ready', async () => {
 		name: `t!help || DM To Contact Developer!`
 	})
 
-  bot.guilds.cache.get('866969279092883456').commands.create({
+  bot.guilds.application.commands.create({
     name: 'help',
     description: 'View the help embed'
   })
-  bot.guilds.cache.get('866969279092883456').commands.create({
+  bot.guilds.application.commands.create({
     name: 'how',
     description: 'Learn how to play tic-tac-toe'
   })
-  bot.guilds.cache.get('866969279092883456').commands.create({
+  bot.guilds.application.commands.create({
     name: 'invite',
     description: 'Get the bot\'s invite link'
   })
-  bot.guilds.cache.get('866969279092883456').commands.create({
+  bot.guilds.application.commands.create({
     name: 'stats',
     description: 'View various statistics on the bot',
     options: [{
