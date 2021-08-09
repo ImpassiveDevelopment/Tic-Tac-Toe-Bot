@@ -22,7 +22,8 @@ Then, run the following commands to install te dependencies and get setup:<br/>
 npm install
 npm run setup
 ```
-After running setup, enter the newly created ".env" file and replace bot_token with your application's token
+After running setup, enter the newly created ".env" file and replace bot_token with your application's token<br/>
+After setting up the bot, in order to enable the Slash commands, you must enter index.js and un-comment the command creation.
 
 ## Author
 [Robert Offord](https://github.com/ImpassiveMoon03)
