@@ -5,6 +5,7 @@ const fs = require('fs');
 const DBL = require("dblapi.js");
 const package = require('./package.json');
 const ticTacNano = require('tic-tac-nano-2');
+const slash = require('./slashcommands')
 
 function mov(message, interaction, args, games, prefix){
   let move = args[0];
@@ -239,52 +240,13 @@ bot.on('ready', async () => {
 
   console.log('DB Write Complete!')
 
-  // bot.application.commands.create({
-  //   name: 'help',
-  //   description: 'View the help embed'
-  // })
-  // bot.application.commands.create({
-  //   name: 'how',
-  //   description: 'Learn how to play tic-tac-toe'
-  // })
-  // bot.application.commands.create({
-  //   name: 'invite',
-  //   description: 'Get the bot\'s invite link'
-  // })
-  // bot.application.commands.create({
-  //   name: 'stats',
-  //   description: 'View various statistics on the bot',
-  //   options: [{
-  //     name: 'options',
-  //     description: 'Which area of statistics you want to view',
-  //     type: "STRING",
-  //     required: false,
-  //     choices: [
-  //       {name: 'uptime', value: 'uptime'},{name: 'ping', value: 'ping'},{name: 'development', value: 'development'}
-  //     ]
-  //   }]
-  // })
-  // bot.application.commands.create({
-  //   name: 'prefix',
-  //   description: 'See the bot\'s prefix in the server'
-  // })
-  // bot.application.commands.create({
-  //   name: 'profile',
-  //   description: 'See your own or someone else\'s profile',
-  //   options: [{
-  //     name: 'target',
-  //     type: 'USER',
-  //     description: 'The person who\'s profile you want to view',
-  //     required: false
-  //   }]
-  // })
+  //slash.initiate(bot)
 })
 
 bot.on('interactionCreate', async interaction => {
   if(!interaction.isCommand()) return
-  if(!interaction.command) return
   else{
-    if(interaction.command.name == 'help'){
+    if(interaction.commandName == 'help'){
       let db = require('./database.json')
       let prefix = db[interaction.guild.id].prefix
       interaction.reply({
@@ -294,7 +256,7 @@ bot.on('interactionCreate', async interaction => {
           .setColor('#b00b1e')
           .addField(`${prefix}help <:slash:873820777932279828>`, 'View the help embed')
           .addField(`${prefix}game <member>`, "Start a game with the selected memeber\n**Member** - The ID or mention of a member")
-          .addField(`${prefix}move <square>`, "Take your turne\n**Square** - A valid space on the board")
+          .addField(`${prefix}move <square> <:slash:873820777932279828>`, "Take your turne\n**Square** - A valid space on the board")
           .addField(`${prefix}end`, "End your current game")
           .addField(`${prefix}board`, "View your current game's board")
           .addField(`${prefix}how <:slash:873820777932279828>`, "Get a small how-to of tic-tac-toe")
@@ -308,7 +270,7 @@ bot.on('interactionCreate', async interaction => {
         ],
         ephemeral: true
       })
-    }else if(interaction.command.name == 'how'){
+    }else if(interaction.commandName == 'how'){
       interaction.reply({
         embeds: [
           new Discord.MessageEmbed()
@@ -318,7 +280,7 @@ bot.on('interactionCreate', async interaction => {
         ],
         ephemeral: true
       })
-    }else if(interaction.command.name == 'invite'){
+    }else if(interaction.commandName == 'invite'){
       interaction.reply({
         embeds: [
           new Discord.MessageEmbed()
@@ -328,7 +290,7 @@ bot.on('interactionCreate', async interaction => {
         ],
         ephemeral: true
       })
-    }else if(interaction.command.name == 'stats'){
+    }else if(interaction.commandName == 'stats'){
       let option = interaction.options.get('options')
       let dependencies = []
       for(var i in Object.keys(package.dependencies)){
@@ -383,14 +345,14 @@ bot.on('interactionCreate', async interaction => {
           ephemeral: true
         })
       }
-    }else if(interaction.command.name == 'prefix'){
+    }else if(interaction.commandName == 'prefix'){
       let db = require('./database.json')
       let guild = db[interaction.guild.id]
       interaction.reply({
         content: `The bot's prefix is ${guild.prefix}`,
         ephemeral: true
       })
-    }else if(interaction.command.name == 'profile'){
+    }else if(interaction.commandName == 'profile'){
       let db = require('./database.json')
       let option = interaction.options.get('target')
       if(!option){
@@ -420,6 +382,18 @@ bot.on('interactionCreate', async interaction => {
           ephemeral: true
         })
       }
+    }else if(interaction.commandName == 'move'){
+      let option = interaction.options.get('square')
+      let prefix = require('./database.json')[interaction.guild.id].prefix
+      let message = {
+        author: interaction.user,
+        channel: interaction.channel,
+        guild: interaction.guild
+      }
+      interaction.reply({
+        content: `${interaction.user.tag} used the move command`
+      })
+      mov(message, interaction, [option.value], games, prefix)
     }
   }
 })
@@ -495,124 +469,182 @@ bot.on('messageCreate', async message => {
 
   if(cmd === 'game'){
     let member = message.mentions.members.first() || message.guild.members.cache.get(args[0])
-    if(!member) return;
+    if(!member) return message.channel.send('You must challenge a member!')
+    if(member.user.bot) return message.channel.send("You cannot challenge a bot!")
+    if(member.user.id == message.author.id) return message.channel.send('You cannot challenge yourself!')
     if(games.has(`${message.author.id}`)){
       return message.channel.send('You are already in a game')
     }
     if(games.has(`${member.id}`)){
       return message.channel.send('The tagged person is in a game')
     }
-    games.set(`${message.author.id}`, {
-      game: true,
-      gameId: no,
-    })
-    games.set(`${member.id}`, {
-      game: true,
-      gameId: no,
-    })
-    let x = args[1] || '❌';
-    let o = args[2] || '⭕';
-    gameStates.set(no, {
-      game: new nano(message.member.user.username, member.user.username, x, o, '⬛'),
-      xPlayer: [message.author.id, 'x'],
-      oPlayer: [member.id, 'o'],
-    })
-    gameStates.get(no).turnPlayer = gameStates.get(no).xPlayer;
-    let tic = gameStates.get(no);
-    no++;
-    const buttons = {
-      A1: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.A1] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('A1'),
-      A2: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.A2] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('A2'),
-      A3: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.A3] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('A3'),
-      B1: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.B1] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('B1'),
-      B2: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.B2] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('B2'),
-      B3: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.B3] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('B3'),
-      C1: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.C1] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('C1'),
-      C2: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.C2] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('C2'),
-      C3: new Discord.MessageButton()
-      .setLabel(tic.game.emojis[tic.game.board.C3] || '⬛')
-      .setStyle('SECONDARY')
-      .setCustomId('C3')
-    }
-    const rowA = new Discord.MessageActionRow()
-    .addComponents([buttons.A1,buttons.A2,buttons.A3])
-    const rowB = new Discord.MessageActionRow()
-    .addComponents([buttons.B1,buttons.B2,buttons.B3])
-    const rowC = new Discord.MessageActionRow()
-    .addComponents([buttons.C1,buttons.C2,buttons.C3])
-
+    let embed = new Discord.MessageEmbed()
+    .setTitle('New Challenge')
+    .setColor('#b00b1e')
+    .setDescription(`${message.author.tag} is challenging ${member.user.tag}\nWill they Accept or Deny`)
+    let row = new Discord.MessageActionRow()
+    .addComponents([
+      new Discord.MessageButton()
+      .setStyle("SUCCESS")
+      .setLabel('Accept')
+      .setCustomId('accept'),
+      new Discord.MessageButton()
+      .setStyle('DANGER')
+      .setLabel('Decline')
+      .setCustomId('decline')
+    ])
     message.channel.send({
-      embeds: [
-        new Discord.MessageEmbed()
-        .setTitle(`Tic Tac Toe`)
-        .setColor('#b00b1e')
-        .setDescription(`${message.member} vs. ${member}`)
-      ],
-      components: [
-        rowA,
-        rowB,
-        rowC
-      ]
-    }).then((m) => {
-      const collector = m.createMessageComponentCollector({ componentType: 'BUTTON', time: 60000 });
-      collector.on('collect', i => {
-        if(i.user.id != message.author.id){
-          i.deferUpdate()
-          i.channel.send({
-            content: `Only ${message.guild.members.cache.get(tic.turnPlayer[0]).user.username} can use these buttons!`,
-          })
-        }else{
-          i.deferUpdate()
-          collector.stop(i.customId)
-        }
-      })
-      collector.on('end', (c, r) => {
-        if(r != null){
-          mov(message, {user:{id:message.author.id}}, [r], games, prefix)
+      embeds: [embed],
+      components: [row]
+    }).then(m => {
+      const filter = (button) => button.user.id == member.user.id
+      const col = m.createMessageComponentCollector({filter, type: "BUTTON", time: 60000})
+      col.on('collect', (b) => {
+        if(b.customId == 'accept'){
           m.edit({
+            content: 'Challenge Accepted!',
+            embeds: [],
+            components: []
+          })
+          games.set(`${message.author.id}`, {
+            game: true,
+            gameId: no,
+          })
+          games.set(`${member.id}`, {
+            game: true,
+            gameId: no,
+          })
+          let x = args[1] || '❌';
+          let o = args[2] || '⭕';
+          gameStates.set(no, {
+            game: new nano(message.member.user.username, member.user.username, x, o, '⬛'),
+            xPlayer: [message.author.id, 'x'],
+            oPlayer: [member.id, 'o'],
+          })
+          gameStates.get(no).turnPlayer = gameStates.get(no).xPlayer;
+          let tic = gameStates.get(no);
+          no++;
+          const buttons = {
+            A1: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.A1] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('A1'),
+            A2: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.A2] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('A2'),
+            A3: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.A3] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('A3'),
+            B1: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.B1] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('B1'),
+            B2: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.B2] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('B2'),
+            B3: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.B3] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('B3'),
+            C1: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.C1] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('C1'),
+            C2: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.C2] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('C2'),
+            C3: new Discord.MessageButton()
+            .setLabel(tic.game.emojis[tic.game.board.C3] || '⬛')
+            .setStyle('SECONDARY')
+            .setCustomId('C3')
+          }
+          const rowA = new Discord.MessageActionRow()
+          .addComponents([buttons.A1,buttons.A2,buttons.A3])
+          const rowB = new Discord.MessageActionRow()
+          .addComponents([buttons.B1,buttons.B2,buttons.B3])
+          const rowC = new Discord.MessageActionRow()
+          .addComponents([buttons.C1,buttons.C2,buttons.C3])
+      
+          message.channel.send({
             embeds: [
               new Discord.MessageEmbed()
               .setTitle(`Tic Tac Toe`)
               .setColor('#b00b1e')
               .setDescription(`${message.member} vs. ${member}`)
-              .addField('Game Board', tic.game.visualize())
+            ],
+            components: [
+              rowA,
+              rowB,
+              rowC
+            ]
+          }).then((m) => {
+            const collector = m.createMessageComponentCollector({ componentType: 'BUTTON', time: 60000 });
+            collector.on('collect', i => {
+              if(i.user.id != message.author.id){
+                i.deferUpdate()
+                i.channel.send({
+                  content: `Only ${message.guild.members.cache.get(tic.turnPlayer[0]).user.username} can use these buttons!`,
+                })
+              }else{
+                i.deferUpdate()
+                collector.stop(i.customId)
+              }
+            })
+            collector.on('end', (c, r) => {
+              if(r != null){
+                mov(message, {user:{id:message.author.id}}, [r], games, prefix)
+                m.edit({
+                  embeds: [
+                    new Discord.MessageEmbed()
+                    .setTitle(`Tic Tac Toe`)
+                    .setColor('#b00b1e')
+                    .setDescription(`${message.member} vs. ${member}`)
+                    .addField('Game Board', tic.game.visualize())
+                  ],
+                  components: []
+                })
+              }
+              else{
+                m.edit({
+                  content: `The buttons will no longer work, so they have been removed. You can still continue the game using the \`${prefix}move\` command!`,
+                  embeds: [
+                    new Discord.MessageEmbed()
+                    .setTitle(`Tic Tac Toe`)
+                    .setColor('#b00b1e')
+                    .setDescription(`${message.member} vs. ${member}`)
+                    .addField('Game Board', tic.game.visualize())
+                  ],
+                  components: []
+                })
+              }
+            })
+          })
+        }else{
+          col.stop('Decline')
+        }
+      })
+      col.on('end', (c, r) => {
+        if(r == 'time'){
+          m.edit({
+            embeds: [
+              new Discord.MessageEmbed()
+              .setTitle('Game Timed Out!')
+              .setColor('#b00b1e')
+              .setDescription(`${member.user.tag} did not respond in the allotted 60 seconds!`)
             ],
             components: []
           })
-        }
-        else{
+        }else{
           m.edit({
-            content: `The buttons will no longer work, so they have been removed. You can still continue the game using the \`${prefix}move\` command!`,
             embeds: [
               new Discord.MessageEmbed()
-              .setTitle(`Tic Tac Toe`)
+              .setTitle('Challenge Declined!')
               .setColor('#b00b1e')
-              .setDescription(`${message.member} vs. ${member}`)
-              .addField('Game Board', tic.game.visualize())
+              .setDescription(`${member.user.tag} has declined your challenge!`)
             ],
             components: []
           })
