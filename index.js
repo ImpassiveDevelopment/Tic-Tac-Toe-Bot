@@ -61,7 +61,7 @@ function mov(message, interaction, args, games, prefix){
         embed.addField('No Winner - Movelog', tic.game.moveLog.join('\n'))
         let db = require('./database.json')
         db[tic.xPlayer[0]].draws+=1
-        db[tic.yPlayer[0]].draws+=1
+        db[tic.oPlayer[0]].draws+=1
         fs.writeFileSync('./database.json', JSON.stringify(db))
         games.delete(tic.xPlayer[0])
         games.delete(tic.oPlayer[0])
@@ -245,6 +245,10 @@ bot.on('ready', async () => {
 
 bot.on('interactionCreate', async interaction => {
   if(!interaction.isCommand()) return
+  if(!interaction.guild) return interaction.reply({
+    content: 'Only available within servers',
+    ephemeral: true
+  })
   else{
     if(interaction.commandName == 'help'){
       let db = require('./database.json')
