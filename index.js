@@ -404,6 +404,16 @@ bot.on('interactionCreate', async interaction => {
 
 bot.on('guildCreate', (guild) => {
   bot.channels.cache.get('872007635245862913').send(`I have been added to the guild \`${guild.name}\`\nServer Count - ${bot.guilds.cache.size}`)
+  let db = require('./database.json')
+  bot.guilds.cache.forEach(g => {
+    let guild = db[g.id]
+    if(!guild){
+      db[g.id] = {
+        prefix: 't!'
+      }
+    }
+  })
+  fs.writeFileSync('.database.json', JSON.stringify(db))
 })
 
 bot.on('guildDelete', (guild) => {
