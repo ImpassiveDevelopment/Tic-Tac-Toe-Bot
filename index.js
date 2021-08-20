@@ -413,11 +413,35 @@ bot.on('guildCreate', (guild) => {
       }
     }
   })
-  fs.writeFileSync('.database.json', JSON.stringify(db))
+  fs.writeFileSync('./database.json', JSON.stringify(db))
 })
 
 bot.on('guildDelete', (guild) => {
   bot.channels.cache.get('872007635245862913').send(`I have been removed from the guild \`${guild.name}\`\nServer Count - ${bot.guilds.cache.size}`)
+})
+
+bot.on('guildMemberAdd', (m) => {
+  let db = require('./database.json')
+  bot.guilds.cache.forEach(g => {
+    let guild = db[g.id]
+    if(!guild){
+      db[g.id] = {
+        prefix: 't!'
+      }
+    }
+  })
+
+  bot.users.cache.forEach(u => {
+    let user = db[u.id]
+    if(!user){
+      db[u.id] = {
+        wins: 0,
+        losses: 0,
+        draws: 0
+      }
+    }
+  })
+  fs.writeFileSync('./database.json', JSON.stringify(db))
 })
 
 bot.on('messageCreate', async message => {
