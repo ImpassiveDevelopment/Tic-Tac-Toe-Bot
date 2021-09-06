@@ -1,5 +1,5 @@
-node_modules
-package-lock.json
 .env
-dblpost.js
-database.json
+package-lock.json
+node_modules
+commands.json
+data.json

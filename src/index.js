@@ -25,7 +25,7 @@ bot.on('ready', () => {
             console.log(command.name+" is already registered. Skipping to next command.")
         }else{
             commands.push(command.name)
-            bot.guilds.cache.get(process.env.TEST_GUILD).commands.create(command.slash)
+            bot.application.commands.create(command.slash)
             fs.writeFileSync('./commands.json', JSON.stringify(commands))
             console.log(command.name+" successfully registered!")
         }
