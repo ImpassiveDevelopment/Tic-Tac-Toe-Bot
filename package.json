@@ -1,16 +1,23 @@
 {
-  "name": "tic-tac-toe",
-  "version": "2.3.3",
-  "description": "",
-  "main": "index.js",
+  "name": "tic-tac-toe-bot",
+  "version": "3.0.0",
+  "description": "The rewrite of my Tic-Tac-Toe Discord bot made to be 100% slash commands",
+  "main": "src/index.js",
   "scripts": {
-    "setup": "touch .env && echo \"TOKEN=bot_token\" >> .env && touch database.json && echo \"{}\" >> database.json"
+    "setup": "touch .env && echo \"TOKEN=bot_token\" >> .env && touch data.json && echo \"{\\\"system\\\": {\\\"games\\\": 0}}\" >> data.json && touch commands.json && echo \"[]\" >> commands.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ImpassiveMoon03/tic-tac-toe-bot.git"
   },
   "author": "Robert Offord",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ImpassiveMoon03/tic-tac-toe-bot/issues"
+  },
+  "homepage": "https://github.com/ImpassiveMoon03/tic-tac-toe-bot#readme",
   "dependencies": {
-    "dblapi.js": "^2.4.1",
-    "discord.js": "^13.0.1",
+    "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "tic-tac-nano-2": "^1.0.5"
   }
