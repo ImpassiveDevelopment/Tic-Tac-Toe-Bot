@@ -17,6 +17,11 @@ bot.commands = new Discord.Collection()
 bot.on('ready', () => {
     console.log('Initiating Commands')
 
+    bot.user.setActivity({
+        name: `/help in ${bot.guilds.cache.size} Servers`,
+        type: 'PLAYING'
+    })
+
     const folder = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'))
     for(var i = 0; i<folder.length; i++){
         let command = require('./commands/'+folder[i])
@@ -55,6 +60,47 @@ bot.on('interactionCreate', (i) => {
         if(!command) return i.reply({content: 'That command is not set up yet!', ephemeral: true})
         else return command.execute(bot, i, Games, GameStates)
     }
+})
+
+bot.on('guildCreate', guild => {
+    let db = require('../data.json')
+    guild.members.cache.forEach(m => {
+        if(!db[m.id]){
+            db[m.id] = {
+                wins: 0,
+                losses: 0,
+                draws: 0
+            }
+        }
+    })
+    bot.user.setActivity({
+        name: `/help in ${bot.guilds.cache.size} Servers`,
+        type: 'PLAYING'
+    })
+    fs.writeFileSync('./data.json', JSON.stringify(db))
+    bot.channels.cache.get(process.env.SERVER_LOGS).send({
+        embeds: [
+            new Discord.MessageEmbed()
+            .setTitle("Guild Added!")
+            .setColor('#b00b1e')
+            .setDescription(`I have been added to the guild \`${guild.name}\`!\nServer Count - ${bot.guilds.cache.size}`)
+        ]
+    })
+})
+
+bot.on('guildDelete', guild => {
+    bot.user.setActivity({
+        name: `/help in ${bot.guilds.cache.size} Servers`,
+        type: 'PLAYING'
+    })
+    bot.channels.cache.get(process.env.SERVER_LOGS).send({
+        embeds: [
+            new Discord.MessageEmbed()
+            .setTitle("Guild Removed!")
+            .setColor('#b00b1e')
+            .setDescription(`I have been removed from the guild \`${guild.name}\`!\nServer Count - ${bot.guilds.cache.size}`)
+        ]
+    })
 })
 
 bot.login(process.env.TOKEN)

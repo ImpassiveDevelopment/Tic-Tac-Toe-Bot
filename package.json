@@ -1,10 +1,10 @@
 {
   "name": "tic-tac-toe-bot",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "The rewrite of my Tic-Tac-Toe Discord bot made to be 100% slash commands",
   "main": "src/index.js",
   "scripts": {
-    "setup": "touch .env && echo \"TOKEN=bot_token\" >> .env && touch data.json && echo \"{\\\"system\\\": {\\\"games\\\": 0}}\" >> data.json && touch commands.json && echo \"[]\" >> commands.json"
+    "setup": "touch .env && echo \"TOKEN=bot_token\nSERVER_LOGS=ID\" >> .env && touch data.json && echo \"{\\\"system\\\": {\\\"games\\\": 0}}\" >> data.json && touch commands.json && echo \"[]\" >> commands.json"
   },
   "repository": {
     "type": "git",
