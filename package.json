@@ -1,6 +1,6 @@
 {
   "name": "tic-tac-toe-bot",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "The rewrite of my Tic-Tac-Toe Discord bot made to be 100% slash commands",
   "main": "src/index.js",
   "scripts": {

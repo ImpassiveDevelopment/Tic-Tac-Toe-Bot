@@ -70,7 +70,7 @@ bot.on('interactionCreate', (i) => {
     }
 })
 
-bot.on('guildCreate', guild => {
+bot.on('guildCreate', async guild => {
     let db = require('../data.json')
     guild.members.cache.forEach(m => {
         if(!db[m.id]){
@@ -101,7 +101,7 @@ bot.on('guildCreate', guild => {
     })
 })
 
-bot.on('guildDelete', guild => {
+bot.on('guildDelete', async guild => {
     bot.user.setActivity({
         name: `/help in ${bot.guilds.cache.size} Servers`,
         type: 'PLAYING'
