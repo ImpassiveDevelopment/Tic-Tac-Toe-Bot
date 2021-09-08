@@ -4,6 +4,9 @@ const nano = require('tic-tac-nano-2')
 const package = require('../package.json')
 const fs = require('fs')
 
+const Topgg = require('@top-gg/sdk')
+const API = new Topgg.Api(process.env.TOPGG)
+
 const Games = new Map()
 const GameStates = new Map()
 var Num = 0;
@@ -14,7 +17,7 @@ const bot = new Discord.Client({
 })
 bot.commands = new Discord.Collection()
 
-bot.on('ready', () => {
+bot.on('ready', async () => {
     console.log('Initiating Commands')
 
     bot.user.setActivity({
@@ -52,6 +55,11 @@ bot.on('ready', () => {
     fs.writeFileSync('./data.json', JSON.stringify(data))
     console.log('Users Cached!')
     console.log('Initiation Complete')
+
+    await API.postStats({
+        serverCount: bot.guilds.cache.size,
+        shardCount: 1
+    })
 })
 
 bot.on('interactionCreate', (i) => {
@@ -86,6 +94,11 @@ bot.on('guildCreate', guild => {
             .setDescription(`I have been added to the guild \`${guild.name}\`!\nServer Count - ${bot.guilds.cache.size}`)
         ]
     })
+
+    await API.postStats({
+        serverCount: bot.guilds.cache.size,
+        shardCount: 1
+    })
 })
 
 bot.on('guildDelete', guild => {
@@ -100,6 +113,11 @@ bot.on('guildDelete', guild => {
             .setColor('#b00b1e')
             .setDescription(`I have been removed from the guild \`${guild.name}\`!\nServer Count - ${bot.guilds.cache.size}`)
         ]
+    })
+
+    await API.postStats({
+        serverCount: bot.guilds.cache.size,
+        shardCount: 1
     })
 })
 

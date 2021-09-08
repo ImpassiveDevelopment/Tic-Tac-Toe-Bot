@@ -1,6 +1,6 @@
 {
   "name": "tic-tac-toe-bot",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "The rewrite of my Tic-Tac-Toe Discord bot made to be 100% slash commands",
   "main": "src/index.js",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ImpassiveMoon03/tic-tac-toe-bot#readme",
   "dependencies": {
+    "@top-gg/sdk": "^3.1.2",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
     "tic-tac-nano-2": "^1.0.5"
