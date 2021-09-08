@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .h1{
+                text-align: center
+            }
+            #selector{
+                width: 80%;
+                margin-left: 10%;
+                background-color: inherit;
+                border: none;
+                font-size: 25px;
+            }
+            .div{
+                display: none;
+                width: 70%;
+                margin: auto;
+            }
+            .head{
+                text-align: center;
+                font-size: 20px;
+            }
+            .ex{
+                text-align: center;
+            }
+            .img{
+                margin-left: 25%;
+                width: 50%;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="h1">Bot Commands, Select Command Below</h1>
+        <select id="selector" onchange="Change()">
+            <option>help</option>
+            <option>game</option>
+            <option>move</option>
+            <option>end</option>
+            <option>board</option>
+            <option>how</option>
+            <option>invite</option>
+            <option>stats</option>
+            <option>profile</option>
+        </select>
+        <div class="div" id="help" style="display:block">
+            <p class="head">View the bot's command list embed</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885024710583271464/Screenshot_2021-09-08_12.51.44_AM.png">
+        </div>
+        <div class="div" id="game">
+            <p class="head">Challenge another server member to a game</p>
+            <p class="ex">Options<br/>Member - The member you wish to challenge</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885025360268394516/Screenshot_2021-09-08_12.54.36_AM.png">
+        </div>
+        <div class="div" id="move">
+            <p class="head">Place an X or O respectively on the board square you wish to play on</p>
+            <p class="ex">Options<br/>Move - The board square you want to play on</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885028291680014346/Screenshot_2021-09-08_1.05.32_AM.png">
+        </div>
+        <div class="div" id="end">
+            <p class="head">End the current game you are playing</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885028712335163392/Screenshot_2021-09-08_1.07.55_AM.png">
+        </div>
+        <div class="div" id="board">
+            <p class="head">Show the board of the current game you are playing</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885029134936444959/Screenshot_2021-09-08_1.09.35_AM.png">
+        </div>
+        <div class="div" id="how">
+            <p class="head">Get a quick how-to on Tic Tac Toe</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885029686474838036/Screenshot_2021-09-08_1.11.47_AM.png">
+        </div>
+        <div class="div" id="invite">
+            <p class="head">Get the bot invite link and the support server invite link</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885030296767041556/Screenshot_2021-09-08_1.14.10_AM.png">
+        </div>
+        <div class="div" id="stats">
+            <p class="head">View some statistics on the bot</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885033957593321482/unknown.png?width=243&height=432">
+        </div>
+        <div class="div" id="profile">
+            <p class="head">View someone's wins/losses/draws</p>
+            <p class="ex">Options<br/>Member - The person who's stats you want to view</p>
+            <p class="ex">Example Output</p>
+            <img src="https://media.discordapp.net/attachments/876316246608605214/885034543839596604/unknown.png">
+        </div>
+        <script>
+            function Change(){
+                let alldiv = document.getElementsByTagName('div')
+                for(var i = 0; i<alldivs.length;i++){
+                    alldivs[i].style.display = "none"
+                }
+                document.getElementById(document.getElementById('selector').value).style.display = "block"
+            }
+        </script>
+    </body>
+</html>
