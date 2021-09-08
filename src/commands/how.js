@@ -5,7 +5,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'how',
-        description: 'Get a basic how-to on Tic Tac Toe'
+        description: 'Get a basic how-to on Tic Tac Toe',
+        dafaultPermission: true,
     },
     execute(bot, i){
         i.reply({

@@ -5,7 +5,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'help',
-        description: 'View the help embed'
+        description: 'View a list of commands',
+        dafaultPermission: true,
     },
     execute(bot, i){
         i.reply({
@@ -22,6 +23,7 @@ module.exports = {
                 .addField(`<:slash:873820777932279828>invite `, "Get the bot invite link")
                 .addField(`<:slash:873820777932279828>stats`, "View some stats on the bot")
                 .addField(`<:slash:873820777932279828>profile {member}`, "View a member stats or your own!\n**Member** - The member who's stats you want to view")
+                .addField(`<:slash:873820777932279828>changelog {version}`, "View the change log\n**Version** - The specific version you want to view the changes for")
                 .setDescription("Want to support development? [Upote the bot on top.gg](https://top.gg/bot/762833969183326228/vote)")
                 .setFooter('<> - Required Arguments || {} - Optional Arguments')
             ]

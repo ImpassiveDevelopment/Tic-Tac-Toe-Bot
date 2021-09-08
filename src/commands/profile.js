@@ -7,6 +7,7 @@ module.exports = {
     slash: {
         name: 'profile',
         description: 'View a player\'s stats',
+        dafaultPermission: true,
         options: [
             {
                 name: 'member',

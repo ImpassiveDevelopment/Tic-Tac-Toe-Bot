@@ -5,7 +5,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'end',
-        description: 'End the current game you are playing'
+        description: 'End the current game you are playing',
+        dafaultPermission: true,
     },
     execute(bot, i, games, gamestates){
         if(!games.has(i.user.id)) return i.reply({content: 'You are not in a game!', ephemeral: true})

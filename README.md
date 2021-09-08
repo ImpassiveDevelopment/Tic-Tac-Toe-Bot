@@ -41,3 +41,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 ### 3.1.2
 - Made "guildCreate" and "guildDelete" async
 - Added changelog to README
+### 3.2.0
+- Added "changelog" command
+- Added bot owner "refresh" command
+- Reworked command registration a tad bit

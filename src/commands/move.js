@@ -7,6 +7,7 @@ module.exports = {
     slash: {
         name: 'move',
         description: 'Take your turn in a game',
+        dafaultPermission: true,
         options: [
             {
                 name: 'move',

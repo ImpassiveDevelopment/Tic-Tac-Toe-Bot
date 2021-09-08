@@ -6,7 +6,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'View Profile',
-        type: "USER"
+        type: "USER",
+        dafaultPermission: true,
     },
     execute(bot, i){
         let data = require('../../data.json')

@@ -8,7 +8,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'Challenge',
-        type: 'USER'
+        type: 'USER',
+        dafaultPermission: true,
     },
     execute(bot, i, games, gamestates){
         let data = require('../../data.json')

@@ -5,7 +5,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'invite',
-        description: 'Get the invite link for the bot'
+        description: 'Get the invite link for the bot',
+        dafaultPermission: true,
     },
     execute(bot, i){
         i.reply({

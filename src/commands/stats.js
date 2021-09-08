@@ -19,7 +19,8 @@ module.exports = {
     permission: 'SEND_MESSAGES',
     slash: {
         name: 'stats',
-        description: 'View some stats on the bot'
+        description: 'View some stats on the bot',
+        dafaultPermission: true,
     },
     execute(bot, i, games, gamestates){
         let data = require('../../data.json')

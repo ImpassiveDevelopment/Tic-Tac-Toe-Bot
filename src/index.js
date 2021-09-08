@@ -33,7 +33,20 @@ bot.on('ready', async () => {
             console.log(command.name+" is already registered. Skipping to next command.")
         }else{
             commands.push(command.name)
-            bot.application.commands.create(command.slash)
+            if(command.slash.defaultPermission == false){
+                let com = await bot.guilds.cache.get(process.env.OS).commands.create(command.slash)
+                com.permissions.add({
+                    permissions: [
+                        {
+                            id: process.env.OWNER,
+                            type: 'USER',
+                            permission: true
+                        }
+                    ]
+                })
+            }else{
+                bot.application.commands.create(command.slash)
+            }
             fs.writeFileSync('./commands.json', JSON.stringify(commands))
             console.log(command.name+" successfully registered!")
         }

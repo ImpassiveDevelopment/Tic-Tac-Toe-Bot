@@ -9,6 +9,7 @@ module.exports = {
     slash: {
         name: 'game',
         description: 'Challenge another member to a game',
+        dafaultPermission: true,
         options: [
             {
                 name: 'member',
