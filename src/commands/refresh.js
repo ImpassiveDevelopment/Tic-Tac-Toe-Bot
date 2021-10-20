@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const fs = require('fs')
+const commands = require('../globalfuncs/commands')
 
 module.exports = {
     name: 'refresh',
@@ -27,6 +28,10 @@ module.exports = {
         
         let commandfile = require(`./${command}.js`)
         bot.application.commands.create(commandfile.slash)
-        i.reply("That command is being refreshed!")
+        i.reply("That command is being refreshed!").then(() => {
+            commands.add_command("Refresh")
+        }).catch(err => {
+            commands.add_error("Refresh", err)
+        })
     }
 }

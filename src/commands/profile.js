@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const fs = require('fs')
+const commands = require('../globalfuncs/commands')
 
 module.exports = {
     name: 'profile',
@@ -39,6 +40,10 @@ module.exports = {
                 .addField('Draws', `${data[user.id].draws}`)
                 .addField('Win/Loss Ratio', `${data[user.id].wins/(data[user.id].losses || 1)}`)
             ]
+        }).then(() => {
+            commands.add_command("Profile")
+        }).catch(err => {
+            commands.add_error("Profile", err)
         })
         fs.writeFileSync('./data.json', JSON.stringify(data))
     }

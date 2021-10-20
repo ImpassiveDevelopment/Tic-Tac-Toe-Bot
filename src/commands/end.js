@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+const commands = require("../globalfuncs/commands")
 
 module.exports = {
     name: 'end',
@@ -24,6 +25,10 @@ module.exports = {
                 .addField('Game Board', tic.game.visualize())
                 .addField('Movelog', tic.game.moveLog.join('\n'))
             ]
+        }).then(() => {
+            commands.add_command("End")
+        }).catch(err => {
+            commands.add_error("End", err)
         })
     }
 }

@@ -1,5 +1,6 @@
 const Discord = require('discord.js')
 const fs = require('fs')
+const commands = require('./commands')
 
 function move(interaction, button, games, gamestates){
     let m
@@ -33,9 +34,17 @@ function move(interaction, button, games, gamestates){
     }
 
     let a = tic.game.turn(m, tic.turnPlayer[1])
-    if(a == false) return interaction.reply({content: 'Invalid Move! Please use the move slash command to continue the game!', ephemeral: true})
+    if(a == false){
+        return interaction.reply({content: 'Invalid Move! Please use the move slash command to continue the game!', ephemeral: true}).catch(err => {
+            commands.add_error("Move", err)
+        })
+    }
     else{
-        if(button == false) interaction.reply({content: 'Move Successful!', ephemeral: true})
+        if(button == false){
+            interaction.reply({content: 'Move Successful!', ephemeral: true}).catch(err => {
+                commands.add_error("Move", err)
+            })
+        }
         else interaction.deferUpdate()
         let embed = new Discord.MessageEmbed()
         .setTitle('Tic Tac Toe')
@@ -51,6 +60,10 @@ function move(interaction, button, games, gamestates){
             games.delete(tic.oPlayer[0])
             return interaction.channel.send({
                 embeds: [embed]
+            }).then(() => {
+                commands.add_command("Move")
+            }).catch(err => {
+                commands.add_error("Move", err)
             })
         }else if(tic.game.board.A1!='' && tic.game.board.A2!='' && tic.game.board.A3!='' && tic.game.board.B1!='' && tic.game.board.B2!='' && tic.game.board.B3!='' && tic.game.board.C1!='' && tic.game.board.C2!='' && tic.game.board.C3!=''){
             embed.addField('Move Log', tic.game.moveLog.join('\n'))
@@ -60,6 +73,10 @@ function move(interaction, button, games, gamestates){
             games.delete(tic.oPlayer[0])
             return interaction.channel.send({
                 embeds: [embed]
+            }).then(() => {
+                commands.add_command("Move")
+            }).catch(err => {
+                commands.add_error("Move", err)
             })
         }else{
             if(tic.turnPlayer === tic.xPlayer){
@@ -121,6 +138,7 @@ function move(interaction, button, games, gamestates){
                 rowC
             ]
         }).then(message => {
+            commands.add_command("Move")
             gamestates.get(player.gameId).lastMessage = message.id
             const collector = message.createMessageComponentCollector({type: 'BUTTON', time: 60000})
             collector.on('collect', (button) => {
@@ -128,6 +146,8 @@ function move(interaction, button, games, gamestates){
                     button.reply({
                         content: `Only <@${tic.turnPlayer[0]}> can use these buttons!`,
                         ephemeral: true
+                    }).catch(err => {
+                        commands.add_error("Move", err)
                     })
                 }else{
                     collector.stop(button.customId)
@@ -139,10 +159,14 @@ function move(interaction, button, games, gamestates){
                     message.edit({
                         content: 'The buttons have been removed due to not being used in 60 seconds. Use the move slash command to continue this game!',
                         components: []
+                    }).catch(err => {
+                        commands.add_error("Move", err)
                     })
                 }else{
                     message.edit({
                         components: []
+                    }).catch(err => {
+                        commands.add_error("Move", err)
                     })
                 }
             })

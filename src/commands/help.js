@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+const commands = require('../globalfuncs/commands')
 
 module.exports = {
     name: 'help',
@@ -27,6 +28,10 @@ module.exports = {
                 .setDescription("Want to support development? [Upote the bot on top.gg](https://top.gg/bot/762833969183326228/vote)")
                 .setFooter('<> - Required Arguments || {} - Optional Arguments')
             ]
+        }).then(() => {
+            commands.add_command("Help")
+        }).catch(err => {
+            commands.add_error("Help", err)
         })
     }
 }

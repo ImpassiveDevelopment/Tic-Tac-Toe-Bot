@@ -2,6 +2,7 @@ const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
 const fs = require('fs')
 const move = require('../globalfuncs/move')
+const commands = require('../globalfuncs/commands')
 
 module.exports = {
     name: 'Challenge',
@@ -37,13 +38,16 @@ module.exports = {
             .setCustomId('decline')
         ])
 
-        i.reply({content: 'Challenge Started!', ephemeral: true})
+        i.reply({content: 'Challenge Started!', ephemeral: true}).catch(err => {
+            commands.add_error("Challenge", err)
+        })
         
         i.channel.send({
             content: `<@${user.id}>`,
             embeds: [embed],
             components: [row]
         }).then(message => {
+            commands.add_command("Challenge")
             const filter = (button) => button.user.id == user.id
             const collector = message.createMessageComponentCollector({filter, type: 'BUTTON', time: 60000})
             collector.on('collect', (button) => {
@@ -135,6 +139,8 @@ module.exports = {
                                 b.reply({
                                     content: `Only ${i.user.username} can use these buttons!`,
                                     ephemeral: true
+                                }).catch(err => {
+                                    commands.add_error("Challenge", err)
                                 })
                             }else{
                                 collect.stop(b.customId)
@@ -146,13 +152,23 @@ module.exports = {
                                 msg.edit({
                                     content: 'The buttons have been removed due to not being used in 60 seconds. Use the move slash command to continue this game!',
                                     components: []
+                                }).then(() => {
+                                    commands.debug.push(commands.now_string()+" - Challenge Message Edit(Move Timeout) Resolved")
+                                }).catch(err => {
+                                    commands.add_error("Challenge", err)
                                 })
                             }else{
                                 msg.edit({
                                     components: []
+                                }).then(() => {
+                                    commands.debug.push(commands.now_string()+" - Challenge Message Edit(Move Success) Resolved")
+                                }).catch(err => {
+                                    commands.add_error("Challenge", err)
                                 })
                             }
                         })
+                    }).catch(err => {
+                        commands.add_error("Challenge", err)
                     })
                 }else{
                     collector.stop('Decline')
@@ -168,6 +184,10 @@ module.exports = {
                             .setDescription(`${user.tag} did not respond in time!`)
                         ],
                         components: []
+                    }).then(() => {
+                        commands.debug.push(commands.now_string()+" - Challenge Message Edit(Timeout) Resolved")
+                    }).catch(err => {
+                        commands.add_error("Challenge", err)
                     })
                 }else if(r == 'Decline'){
                     message.edit({
@@ -178,15 +198,25 @@ module.exports = {
                             .setDescription(`${user.tag} has declined the challenge!`)
                         ],
                         components: []
+                    }).then(() => {
+                        commands.debug.push(commands.now_string()+" - Challenge Message Edit(Decline) Resolved")
+                    }).catch(err => {
+                        commands.add_error("Challenge", err)
                     })
                 }else{
                     message.edit({
                         content: 'Challenge Accepted!',
                         embeds: [],
                         components: []
+                    }).then(() => {
+                        commands.debug.push(commands.now_string()+" - Challenge Message Edit(Accept) Resolved")
+                    }).catch(err => {
+                        commands.add_error("Challenge", err)
                     })
                 }
             })
+        }).catch(err => {
+            commands.add_error("Challenge", err)
         })
     }
 }

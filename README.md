@@ -45,3 +45,6 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 - Added "changelog" command
 - Added bot owner "refresh" command
 - Reworked command registration a tad bit
+### 3.3.0 - October 19, 2021
+- Added command error handling
+- Added admin debugger portal

@@ -3,6 +3,8 @@ const Discord = require('discord.js')
 const nano = require('tic-tac-nano-2')
 const package = require('../package.json')
 const fs = require('fs')
+const commands = require('./globalfuncs/commands')
+const express = require('express')
 
 const Topgg = require('@top-gg/sdk')
 const API = new Topgg.Api(process.env.TOPGG)
@@ -12,12 +14,30 @@ const GameStates = new Map()
 var Num = 0;
 
 const bot = new Discord.Client({
-    intents: new Discord.Intents(4659),
+    intents: new Discord.Intents(515),
     partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 })
 bot.commands = new Discord.Collection()
 
+
 bot.on('ready', async () => {
+    const app = express()
+    app.get("/", (req, res) => {
+        res.send(commands.to_html())
+    })
+    app.post('/api', (req, res) => {
+        let data = req.headers
+        if(data.type == "status"){
+            status = data.status
+            bot.user.setActivity(status)
+        }
+    })
+    app.listen('8080', () => {
+        console.log("App Ready on Port 8080")
+    })
+    let now = new Date()
+    let nowstring = `${now.getMonth()}/${now.getDate()}/${now.getFullYear()} - ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+    commands.debug.push(`${nowstring} - Bot Started!`)
     console.log('Initiating Commands')
 
     bot.user.setActivity({
@@ -73,6 +93,10 @@ bot.on('ready', async () => {
         serverCount: bot.guilds.cache.size,
         shardCount: 1
     })
+})
+
+bot.on('error', (error) => {
+    commands.add_error(error)
 })
 
 bot.on('interactionCreate', (i) => {
