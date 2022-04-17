@@ -4,7 +4,7 @@
   "description": "The rewrite of my Tic-Tac-Toe Discord bot made to be 100% slash commands",
   "main": "src/index.js",
   "scripts": {
-    "setup": "touch .env && echo \"TOKEN=bot_token\nSERVER_LOGS=ID\" >> .env && touch data.json && echo \"{\\\"system\\\": {\\\"games\\\": 0}}\" >> data.json && touch commands.json && echo \"[]\" >> commands.json"
+    "setup": "./setup.sh"
   },
   "repository": {
     "type": "git",

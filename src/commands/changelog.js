@@ -1,5 +1,4 @@
 const Discord = require('discord.js')
-const commands = require('../globalfuncs/commands')
 
 const embeds = {
     '3.1.1': new Discord.MessageEmbed()
@@ -17,7 +16,11 @@ const embeds = {
     '3.3.0': new Discord.MessageEmbed()
     .setTitle('v3.3.0')
     .setColor("#b00b1e")
-    .setDescription('**October 19, 2021**\n- Added command error handling\n- Added admin debug portal')
+    .setDescription('**October 19, 2021**\n- Added command error handling\n- Added admin debug portal'),
+    '3.3.1': new Discord.MessageEmbed()
+    .setTitle("v3.3.1")
+    .setColor("#b00b1e")
+    .setDescription('**April 17, 2022**\n- Removed `profile` command, and removed logging for wins/loss/draws\n- Updated changelog command\n- Removed debug webserver\n- Made the bot setup a bash executable file')
 }
 
 module.exports = {
@@ -35,7 +38,9 @@ module.exports = {
             choices: [
                 {name: 'v3.1.1', value: '3.1.1'},
                 {name: 'v3.1.2', value: '3.1.2'},
-                {name: 'v3.2.0', value: '3.2.0'}
+                {name: 'v3.2.0', value: '3.2.0'},
+                {name: 'v3.3.0', value: '3.3.0'},
+                {name: 'v3.3.1', value: '3.3.1'}
             ]
         }]
     },
@@ -46,10 +51,6 @@ module.exports = {
                 embeds: [
                     embeds[option.value]
                 ]
-            }).then(() => {
-                commands.add_command("Changelog(Static)")
-            }).catch(err => {
-                commands.add_error("Changelog(Static)", error)
             })
         }
         if(!option){
@@ -76,14 +77,17 @@ module.exports = {
                     },
                     {
                         label: 'v3.3.0',
-                        description: 'Releade 3.3.0',
+                        description: 'Release 3.3.0',
                         value: '3.3.0'
+                    },
+                    {
+                        label: 'v3.3.1',
+                        description: 'Release 3.3.1',
+                        value: '3.3.1'
                     }
                 ])
             ])
-            i.reply({content: 'Changelog Initiated!', ephemeral: true}).catch(err => {
-                commands.add_error("Changelog(Dynamic)", err)
-            })
+            i.reply({content: 'Changelog Initiated!', ephemeral: true})
             i.channel.send({
                 embeds: [
                     embeds['3.1.1']
@@ -92,7 +96,6 @@ module.exports = {
                     row
                 ]
             }).then(message => {
-                commands.add_command("Changelog(Dynamic)")
                 const filter = (c) => c.user === i.user
                 const collector = message.createMessageComponentCollector({filter, type: 'SELECT_MENU', time: 90000})
                 collector.on('collect', (interaction) => {
@@ -105,19 +108,11 @@ module.exports = {
                         components: [
                             row
                         ]
-                    }).then(() => {
-                        commands.debug.push(`${commands.now_string()} - Changelog Message Edit Successful`)
-                    }).catch(err => {
-                        commands.add_error("Changelog(Dynamic)", err)
                     })
                 })
                 collector.on('end', (c) => {
                     message.edit({
                         components: []
-                    }).then(() => {
-                        commands.debug.push(`${commands.now_string()} - Resloved Changelog(Dynamic) Timeout`)
-                    }).catch(err => {
-                        commands.add_error("Changelog(Dynamic)", err)
                     })
                 })
             })

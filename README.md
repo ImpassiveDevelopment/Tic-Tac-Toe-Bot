@@ -20,10 +20,10 @@ cd tic-tac-toe-bot
 Then, run the following commands to install te dependencies and get setup:<br/>
 ```
 npm install
-npm run setup
+./setup.sh
 ```
-After running setup, enter the newly created ".env" file and replace bot_token with your application's token<br/>
-After setting up the bot, in order to enable the Slash commands, you must enter index.js and un-comment the command creation.
+If your system cannot execute the `setup.sh` file, just enter the file and copy/paste each line into your command terminal<br/>
+After running setup, enter the newly created ".env" file and enter your bot's token
 
 ## Author
 [Robert Offord](https://github.com/ImpassiveMoon03)
@@ -48,3 +48,8 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 ### 3.3.0 - October 19, 2021
 - Added command error handling
 - Added admin debugger portal
+### 3.3.1 - April 17, 2022
+- Removed debug webserver
+- Fixed changelog command
+- Removed profile command and indexing of wins/losses
+- Made setup an executable .sh file

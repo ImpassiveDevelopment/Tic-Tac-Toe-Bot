@@ -17,22 +17,6 @@ function move(interaction, button, games, gamestates){
     mm.edit({components: []})
     if(!tic.turnPlayer[0] == interaction.user.id) return interaction.reply({content: 'It is not your turn!', ephemeral: true})
 
-    let db = require('../../data.json')
-    if(!db[tic.xPlayer[0]]){
-        db[tic.xPlayer[0]] = {
-            wins: 0,
-            losses: 0,
-            draws: 0
-        }
-    }
-    if(!db[tic.oPlayer[0]]){
-        db[tic.oPlayer[0]] = {
-            wins: 0,
-            losses: 0,
-            draws: 0
-        }
-    }
-
     let a = tic.game.turn(m, tic.turnPlayer[1])
     if(a == false){
         return interaction.reply({content: 'Invalid Move! Please use the move slash command to continue the game!', ephemeral: true}).catch(err => {
@@ -53,9 +37,6 @@ function move(interaction, button, games, gamestates){
         
         if(tic.game.didWin() != false && tic.game.didWin() != 'No one Wins'){
             embed.addField('Move Log', tic.game.moveLog.join('\n'))
-            db[tic.turnPlayer[0]].wins+=1
-            if(tic.turnPlayer == tic.xPlayer) db[tic.oPlayer[0]].losses+=1
-            if(tic.turnPlayer == tic.oPlayer) db[tic.xPlayer[0]].losses+=1
             games.delete(tic.xPlayer[0])
             games.delete(tic.oPlayer[0])
             return interaction.channel.send({
@@ -67,8 +48,6 @@ function move(interaction, button, games, gamestates){
             })
         }else if(tic.game.board.A1!='' && tic.game.board.A2!='' && tic.game.board.A3!='' && tic.game.board.B1!='' && tic.game.board.B2!='' && tic.game.board.B3!='' && tic.game.board.C1!='' && tic.game.board.C2!='' && tic.game.board.C3!=''){
             embed.addField('Move Log', tic.game.moveLog.join('\n'))
-            db[tic.xPlayer[0]].draws+=1
-            db[tic.oPlayer[0]].draws+=1
             games.delete(tic.xPlayer[0])
             games.delete(tic.oPlayer[0])
             return interaction.channel.send({
@@ -172,8 +151,6 @@ function move(interaction, button, games, gamestates){
             })
         })
     }
-
-    fs.writeFileSync('./data.json', JSON.stringify(db))
 }
 
 module.exports = move

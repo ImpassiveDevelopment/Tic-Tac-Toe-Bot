@@ -1,6 +1,5 @@
 const Discord = require('discord.js')
 const package = require('../../package.json')
-const commands = require('../globalfuncs/commands')
 
 function check(t){
     if(t < 10) return `0${t}`
@@ -45,10 +44,6 @@ module.exports = {
               .addField('Server Count', `${bot.guilds.cache.size}`)
               .addField('Total Number of Games', `${data.system.games}`)
             ]
-        }).then(() => {
-            commands.add_command("Stats")
-        }).catch(err => {
-            commands.add_error("Stats", err)
         })
     }
 }

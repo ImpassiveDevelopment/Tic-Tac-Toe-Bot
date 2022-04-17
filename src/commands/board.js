@@ -22,10 +22,7 @@ module.exports = {
                 .setDescription(`<@${game.xPlayer[0]}> vs. <@${game.oPlayer[0]}>`)
                 .addField('Game Board', game.game.visualize())
             ]
-        }).then(() => {
-            commands.add_command("Board")
         }).catch(err => {
-            commands.add_error("Board", err)
             i.channel.send({
                 embeds: [
                     new Discord.MessageEmbed()
@@ -34,11 +31,6 @@ module.exports = {
                     .setDescription(`<@${game.xPlayer[0]}> vs. <@${game.oPlayer[0]}>`)
                     .addField('Game Board', game.game.visualize())
                 ]
-            }).then(() => {
-                commands.debug.push(commands.now_string()+" - Board Command Resolved")
-            }).catch(err => {
-                commands.debug.push(commands.now_string()+" - Command Could Not Be Resolved!")
-                commands.add_error("Board", err)
             })
         })
     }
